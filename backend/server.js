@@ -16,6 +16,7 @@ const testResultRoutes = require("./routes/testResults");
 
 const systemAdminRoutes = require('./routes/SystemRoute'); 
 const fetchAdminRoutes = require('./routes/fetchAdminRoute');
+const adminHistoryRoutes = require("./routes/adminHistoryRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -50,7 +51,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/system-admin', systemAdminRoutes);
 
 // 3. Admin Data Management Routes 
-app.use('/api/admin', fetchAdminRoutes); 
+app.use('/api/admin', fetchAdminRoutes);
+
+app.use("/api/admin-history", adminHistoryRoutes);
 
 
 

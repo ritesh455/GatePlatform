@@ -43,6 +43,23 @@ interface AdminUpdateResponse {
   message: string;
 }
 
+// --- TEST HISTORY INTERFACES ---
+
+interface TestHistory {
+  test_id: string;
+  test_title: string;
+  attempt_count: number;
+}
+
+interface TestAttempt {
+  email: string;
+  city: string;
+  state: string;
+  score: number;
+  total_questions: number;
+  attempted_at: string;
+}
+
 
 class ApiService {
   private getAuthHeaders(): HeadersInit {
@@ -393,6 +410,24 @@ async getTestResults(studentUserNo?: string | number) {
   //Get User Profile
   async getUserProfile() {
   return this.request<any>("/auth/profile");
+}
+
+// -------------------------------
+// --- ADMIN TEST HISTORY ---
+// -------------------------------
+
+async getTestHistory(search?: string) {
+  let endpoint = "/admin-history/test-history";
+
+  if (search) {
+    endpoint += `?search=${encodeURIComponent(search)}`;
+  }
+
+  return this.request<TestHistory[]>(endpoint);
+}
+
+async getTestAttempts(testId: string) {
+  return this.request<TestAttempt[]>(`/admin-history/test-history/${testId}`);
 }
 
   // --- Admin Endpoints ---

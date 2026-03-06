@@ -36,6 +36,7 @@ import Progress from './components/Progress';
 import AdminPanel from './components/AdminPanel';
 import ChapterManagement from './components/ChapterManagement';
 import MaterialView from "./components/MaterialView"
+import TestHistory from "./components/TestHistory";
 // ------------------------------------
 import PaperManagement from './components/PaperManagement';
 
@@ -83,6 +84,7 @@ function AppContent() {
         { id: 'chapters', label: 'Subjects', icon: BookOpen, path: '/chapters' },
         { id: 'study', label: 'Study Materials', icon: BookOpen, path: '/study' },
         { id: 'tests', label: 'Mock Tests', icon: Settings, path: '/tests' },
+        { id: 'history', label: 'Test History', icon: BarChart3, path: '/history' },
         // { id: 'papers', label: 'Papers', icon: BookOpen, path: '/papers' },
     ];
 
@@ -226,6 +228,7 @@ const AuthenticatedRoutes = () => {
             <Route path="/study" element={<StudyMaterials />} />
             <Route path="/study/:id" element={<MaterialView />} />
             <Route path="/tests" element={<MockTests />} />
+            <Route path="/history" element={<TestHistory />} />
             {/* <Route path="/papers" element={<PaperManagement />} /> */}
             
             {/* Student-only route */}
