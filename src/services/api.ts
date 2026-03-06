@@ -430,6 +430,15 @@ async getTestAttempts(testId: string) {
   return this.request<TestAttempt[]>(`/admin-history/test-history/${testId}`);
 }
 
+
+//chat bot
+async askGateAI(question: string) {
+  return this.request("/chatbot/ask", {
+    method: "POST",
+    body: JSON.stringify({ question })
+  });
+}
+
   // --- Admin Endpoints ---
   async getUsersCount() {
     return this.request<{ totalUsers: number; totalStudents: number; totalAdmins: number }>("/admin/users-count");

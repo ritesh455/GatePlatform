@@ -37,6 +37,7 @@ import AdminPanel from './components/AdminPanel';
 import ChapterManagement from './components/ChapterManagement';
 import MaterialView from "./components/MaterialView"
 import TestHistory from "./components/TestHistory";
+import GateChatbot from "./components/GateChatbot";
 // ------------------------------------
 import PaperManagement from './components/PaperManagement';
 
@@ -73,6 +74,7 @@ function AppContent() {
         { id: 'study', label: 'Study Materials', icon: BookOpen, path: '/study' },
         { id: 'tests', label: 'Mock Tests', icon: Settings, path: '/tests' },
         { id: 'progress', label: 'Progress', icon: BarChart3, path: '/progress' },
+        { id: 'chatbot', label: 'AI Tutor', icon: BookOpen, path: '/chatbot' },
         
         // { id: 'papers', label: 'Papers', icon: BookOpen, path: '/papers' },
     ];
@@ -228,6 +230,7 @@ const AuthenticatedRoutes = () => {
             <Route path="/study" element={<StudyMaterials />} />
             <Route path="/study/:id" element={<MaterialView />} />
             <Route path="/tests" element={<MockTests />} />
+            <Route path="/chatbot" element={<GateChatbot />} />
             <Route path="/history" element={<TestHistory />} />
             {/* <Route path="/papers" element={<PaperManagement />} /> */}
             

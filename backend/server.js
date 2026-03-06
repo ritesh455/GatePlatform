@@ -13,6 +13,7 @@ const studyMaterialRoutes = require("./routes/studyMaterials");
 const mockTestRoutes = require("./routes/mockTests");
 const chapterRoutes = require("./routes/chapters");
 const testResultRoutes = require("./routes/testResults");
+const chatbotRoutes = require("./routes/chatbotRoutes");
 
 const systemAdminRoutes = require('./routes/SystemRoute'); 
 const fetchAdminRoutes = require('./routes/fetchAdminRoute');
@@ -54,6 +55,9 @@ app.use('/api/system-admin', systemAdminRoutes);
 app.use('/api/admin', fetchAdminRoutes);
 
 app.use("/api/admin-history", adminHistoryRoutes);
+
+//chat bot routes
+app.use("/api/chatbot", chatbotRoutes);
 
 
 
