@@ -18,6 +18,7 @@ import {
 import { AuthProvider, useAuth } from './contexts/AuthContext'; 
 // Assuming DataProvider is the name of your data context provider
 import { DataProvider as AppDataProvider } from './contexts/DataContext'; 
+import UserProfile from './components/UserProfile';
 
 // --- IMPORT ALL PAGES/COMPONENTS ---
 import HomePage from './pages/HomePage'; 
@@ -65,10 +66,12 @@ function AppContent() {
 
     const userNavItems = [
         { id: 'dashboard', label: 'Dashboard', icon: BarChart3, path: '/dashboard' },
+        { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
         { id: 'chapters', label: 'Subjects', icon: BookOpen, path: '/chapters' },
         { id: 'study', label: 'Study Materials', icon: BookOpen, path: '/study' },
         { id: 'tests', label: 'Mock Tests', icon: Settings, path: '/tests' },
         { id: 'progress', label: 'Progress', icon: BarChart3, path: '/progress' },
+        
         // { id: 'papers', label: 'Papers', icon: BookOpen, path: '/papers' },
     ];
 
@@ -216,6 +219,7 @@ const AuthenticatedRoutes = () => {
         <Routes>
             {/* Student/Admin Routes (Shared and role-specific) */}
             <Route path="/dashboard" element={user.role === 'admin' ? <AdminDashboard /> : <UserDashboard />} />
+            <Route path="/profile" element={<UserProfile />} />
             <Route path="/chapters" element={<ChapterManagement />} />
             <Route path="/study" element={<StudyMaterials />} />
             <Route path="/tests" element={<MockTests />} />

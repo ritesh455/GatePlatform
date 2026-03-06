@@ -390,6 +390,11 @@ async getTestResults(studentUserNo?: string | number) {
     });
   }
 
+  //Get User Profile
+  async getUserProfile() {
+  return this.request<any>("/auth/profile");
+}
+
   // --- Admin Endpoints ---
   async getUsersCount() {
     return this.request<{ totalUsers: number; totalStudents: number; totalAdmins: number }>("/admin/users-count");

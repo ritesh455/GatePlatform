@@ -9,6 +9,7 @@ const { login } = require('../controllers/loginController');
 const { validateRegistration } = require('../utils/validation');
 const { validateLogin } = require('../utils/loginValidation'); 
 const { authenticateToken } = require("../middleware/auth"); // Assuming this is the middleware file
+const { getUserProfile } = require('../controllers/profileController');
 
 const router = express.Router();
 
@@ -55,6 +56,9 @@ router.post(
   login          
 );
 
+// GET /api/auth/profile
+router.get("/profile", authenticateToken, getUserProfile);
+
 // ===============================================
 // === SECONDARY AUTH ROUTES (PRESERVED) ===
 // ===============================================
@@ -86,6 +90,7 @@ router.post("/refresh", authenticateToken, (req, res) => {
   try {
     // Generate new token with same payload
   const dbUser = user.rows[0];
+
 
 const payload = {
     userId: dbUser.id,

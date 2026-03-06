@@ -1,11 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { BookOpen, FileText, Video, Plus, Edit, Trash2, Upload, Play, X, Search, Filter } from 'lucide-react';
+import { BookOpen, FileText, Video, Plus, Edit, Trash2, Upload, Play, X, Search, Filter, ChevronDown, ChevronRight } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { apiService } from '../services/api';
 
+interface DeleteConfirmationModalProps {
+  chapter: any;
+  onClose: () => void;
+  onConfirm: () => void;
+}
 // Confirmation Modal Component to replace window.confirm
-const DeleteConfirmationModal = ({ chapter, onClose, onConfirm }) => {
+const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({ chapter, onClose, onConfirm }) => {
     if (!chapter) return null;
 
     return (
@@ -86,7 +91,10 @@ const ChapterManagement: React.FC = () => {
     return chapters
       .filter(chapter => {
           // 1. Search filter
-          const matchesSearch = chapter.chapter_title.toLowerCase().includes(searchQuery.toLowerCase());
+          const matchesSearch =
+  (chapter.chapter_title ?? "")
+    .toLowerCase()
+    .includes(searchQuery.toLowerCase());
 
           // 2. Subject filter
           const matchesSubject = subjectFilter === 'All Subjects' || chapter.chapter_title === subjectFilter;
@@ -163,6 +171,16 @@ const ChapterManagement: React.FC = () => {
     const videoId = extractYouTubeId(url);
     return videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null;
   };
+
+  const [openChapters, setOpenChapters] = useState<Record<string, boolean>>({});
+
+  const toggleChapter = (chapterId: string) => {
+  setOpenChapters((prev) => ({
+    ...prev,
+    [chapterId]: !prev[chapterId],
+  }));
+};
+
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6">
@@ -428,13 +446,22 @@ const ChapterManagement: React.FC = () => {
             const videoTutorials = chapter.videoTutorials ?? [];
 
             return (
-              <div key={chapter.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <div key={chapter.id ?? `chapter-${chapter.chapter_number}`} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 {/* Chapter Header */}
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between cursor-pointer"
+     onClick={() => toggleChapter(chapter.id)}>
                   <div>
-                    <h2 className="text-xl font-bold text-slate-900">
-                      Subject : {chapter.chapter_title}
-                    </h2>
+                    <div className="flex items-center space-x-2">
+  {openChapters[chapter.id] ? (
+    <ChevronDown className="w-5 h-5 text-slate-600" />
+  ) : (
+    <ChevronRight className="w-5 h-5 text-slate-600" />
+  )}
+
+  <h2 className="text-xl font-bold text-slate-900">
+    Subject : {chapter.chapter_title}
+  </h2>
+</div>
                     <p className="text-xs font-semibold text-purple-600 mt-1">
                         Branch: {chapter.branch || 'ALL'}
                     </p>
@@ -483,7 +510,8 @@ const ChapterManagement: React.FC = () => {
                 </div>
 
                 {/* Chapter Content */}
-                <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {openChapters[chapter.id] && (
+  <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* PDF Notes Section */}
                   <div>
                     <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
@@ -491,7 +519,7 @@ const ChapterManagement: React.FC = () => {
                       PDF Notes
                     </h3>
                     {pdfNotes.length > 0 ? (
-                      <div className="space-y-3">
+                      <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2">
                         {pdfNotes.map((pdf) => (
                           <div key={pdf.id} className="bg-slate-50 rounded-lg p-4 flex items-center justify-between">
                             <div className="flex items-center space-x-3">
@@ -500,7 +528,7 @@ const ChapterManagement: React.FC = () => {
                               </div>
                               <div>
                                 <h4 className="font-medium text-slate-900">{pdf.file_name}</h4>
-                                <p className="text-sm text-slate-600">Added {new Date(pdf.created_at).toLocaleDateString()}</p>
+                                <p className="text-sm text-slate-600">Added {pdf.created_at ? new Date(pdf.created_at).toLocaleDateString() : "Recently"}</p>
                               </div>
                             </div>
 
@@ -548,7 +576,7 @@ const ChapterManagement: React.FC = () => {
                       Video Tutorials
                     </h3>
                     {videoTutorials.length > 0 ? (
-                      <div className="space-y-3">
+                      <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2">
                         {videoTutorials.map((video) => (
                           <div key={video.id} className="bg-slate-50 rounded-lg p-4">
                             <div className="flex items-start justify-between mb-3">
@@ -561,7 +589,7 @@ const ChapterManagement: React.FC = () => {
                                       {video.duration}
                                     </span>
                                   )}
-                                  <span>Added {new Date(video.addedAt).toLocaleDateString()}</span>
+                                  <span>Added {video.addedAt ? new Date(video.addedAt).toLocaleDateString() : "Recently"}</span>
                                 </div>
                               </div>
 
@@ -597,6 +625,7 @@ const ChapterManagement: React.FC = () => {
                     )}
                   </div>
                 </div>
+                )}
               </div>
             );
           })}
