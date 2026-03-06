@@ -35,6 +35,7 @@ import MockTests from './components/MockTests';
 import Progress from './components/Progress';
 import AdminPanel from './components/AdminPanel';
 import ChapterManagement from './components/ChapterManagement';
+import MaterialView from "./components/MaterialView"
 // ------------------------------------
 import PaperManagement from './components/PaperManagement';
 
@@ -77,6 +78,7 @@ function AppContent() {
 
     const adminNavItems = [
         { id: 'dashboard', label: 'Dashboard', icon: BarChart3, path: '/dashboard' },
+         { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
         { id: 'admin', label: 'Admin Panel', icon: Settings, path: '/admin' },
         { id: 'chapters', label: 'Subjects', icon: BookOpen, path: '/chapters' },
         { id: 'study', label: 'Study Materials', icon: BookOpen, path: '/study' },
@@ -87,7 +89,7 @@ function AppContent() {
     const navItems = user?.role === 'admin' ? adminNavItems : userNavItems;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50">
             {/* Header */}
             <header className="bg-white shadow-sm border-b border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -124,9 +126,9 @@ function AppContent() {
                 </div>
             </header>
 
-            <div className="flex">
+            <div className="flex flex-1 overflow-hidden">
                 {/* Sidebar */}
-                <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transition-transform duration-300 ease-in-out`}>
+                <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transition-transform duration-300 ease-in-out h-full`}>
                     <div className="flex flex-col h-full pt-16 lg:pt-0">
                         <nav className="flex-1 px-4 py-6 space-y-2">
                             {navItems.map((item) => (
@@ -142,7 +144,7 @@ function AppContent() {
                 </div>
 
                 {/* Main Content: This is where the React Router <Route> children will render */}
-                <div className="flex-1 lg:ml-0">
+                <div className="flex-1 lg:ml-0 overflow-y-auto">
                     <main className="p-6">
                         {/* We use React Router's <Routes> inside AppRouter instead of renderAuthenticatedContent() */}
                         <AuthenticatedRoutes /> 
@@ -222,6 +224,7 @@ const AuthenticatedRoutes = () => {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/chapters" element={<ChapterManagement />} />
             <Route path="/study" element={<StudyMaterials />} />
+            <Route path="/study/:id" element={<MaterialView />} />
             <Route path="/tests" element={<MockTests />} />
             {/* <Route path="/papers" element={<PaperManagement />} /> */}
             

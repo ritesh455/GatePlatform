@@ -19,7 +19,7 @@ const getUserProfile = async (req, res) => {
     } else {
 
       query = `
-        SELECT id, email, role, created_at
+        SELECT id, email, role, branch, created_at
         FROM admins
         WHERE id = $1
       `;

@@ -230,7 +230,8 @@ export const AdminLoginPage: React.FC<{ onLogin: (token: string) => void }> = ({
        
        // FIX: Call onLogin with the received token/data after success
        if (response.ok && data.success && data.token) {
-         onLogin(data.token); // Pass the token up to the global auth handler
+        localStorage.setItem("systemAdminToken", data.token);
+        window.location.reload();
        } else {
          setError(data.message || 'Login failed. Please check your credentials.');
        }
@@ -738,25 +739,30 @@ export const DashboardLayout: React.FC<{ onLogout: () => void }> = ({ onLogout }
 
 // --- ROOT COMPONENT: Wraps the application with the Admin Data Provider ---
 const SystemAdmin: React.FC = () => {
-    // FIX: Use the global Auth Context state instead of local useState
-    const auth = useAuth();
 
-    // FIX: Loading check for both global auth and initial data fetch
-    if (auth.authLoading) {
-        return <LoadingSpinner />;
+    const systemAdminToken = localStorage.getItem("systemAdminToken");
+
+    // If token not found → show login page
+    if (!systemAdminToken) {
+        return (
+            <AdminLoginPage
+                onLogin={(token) => {
+                    localStorage.setItem("systemAdminToken", token);
+                    window.location.reload();
+                }}
+            />
+        );
     }
 
-    // FIX: Check global authentication status
-    if (!auth.isAuthenticated) {
-        // Pass global login function (loginWithToken) to AdminLoginPage
-        return <AdminLoginPage onLogin={auth.loginWithToken} />;
-    }
-
-    // Authenticated view: wrap the dashboard content in the AdminDataProvider
+    // If token exists → allow dashboard
     return (
         <AdminDataProvider>
-            {/* Pass global logout function (logoutUser) to DashboardLayout */}
-            <DashboardLayout onLogout={auth.logoutUser} />
+            <DashboardLayout
+                onLogout={() => {
+                    localStorage.removeItem("systemAdminToken");
+                    window.location.reload();
+                }}
+            />
         </AdminDataProvider>
     );
 };

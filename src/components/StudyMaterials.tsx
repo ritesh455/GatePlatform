@@ -5,6 +5,7 @@ import { useState } from "react"
 import { BookOpen, Search, Filter, Edit, Trash2, Plus, Eye, X } from "lucide-react"
 import { useData } from "../contexts/DataContext"
 import { useAuth } from "../contexts/AuthContext"
+import { useNavigate } from "react-router-dom"
 
 const StudyMaterials: React.FC = () => {
   const { studyMaterials, addStudyMaterial, updateStudyMaterial, deleteStudyMaterial, loading } = useData()
@@ -13,7 +14,6 @@ const StudyMaterials: React.FC = () => {
   const [selectedSubject, setSelectedSubject] = useState("")
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [viewingMaterial, setViewingMaterial] = useState<any>(null)
   const [formData, setFormData] = useState({
     title: "",
     subject: "",
@@ -29,6 +29,7 @@ const filteredMaterials = studyMaterials.filter(
       .includes(searchTerm.toLowerCase()) &&
     (selectedSubject === "" || material.subject === selectedSubject),
 );
+const navigate = useNavigate();
 
 
 const handleSubmit = async (e: React.FormEvent) => {
@@ -209,7 +210,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
           )}
 
-          {/* View Material Modal */}
+          {/* View Material Modal
           {viewingMaterial && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -236,7 +237,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Materials Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -265,7 +266,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
                 <div className="flex items-center justify-between">
                   <button
-                    onClick={() => setViewingMaterial(material)}
+                    onClick={() => navigate(`/study/${material.id}`)}
                     className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
                   >
                     <Eye size={16} />
