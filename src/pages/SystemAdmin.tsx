@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { BookOpen, Users, UserCog, User, BarChart2, CheckCircle, XCircle, Ban, Trash2, Search, Filter, Mail, Phone, FileText } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, TooltipProps } from 'recharts';
 
@@ -624,6 +624,10 @@ export const StudentManagementSection: React.FC = () => {
 export const DashboardLayout: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     const { admins, students, loading, error, fetchDashboardData } = useAdminData();
     const [activeSection, setActiveSection] = useState<'dashboard' | 'admins' | 'students'>('dashboard');
+
+        useEffect(() => {
+        fetchDashboardData();
+    }, [fetchDashboardData]);
 
     // Calculate chart data using the real student data
     const branchChartData = useMemo(() => calculateBranchData(students), [students]);
