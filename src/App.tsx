@@ -18,6 +18,8 @@ import {
 import { AuthProvider, useAuth } from './contexts/AuthContext'; 
 // Assuming DataProvider is the name of your data context provider
 import { DataProvider as AppDataProvider } from './contexts/DataContext'; 
+import { SocketProvider } from './contexts/SocketContext';
+
 import UserProfile from './components/UserProfile';
 
 // --- IMPORT ALL PAGES/COMPONENTS ---
@@ -38,6 +40,7 @@ import ChapterManagement from './components/ChapterManagement';
 import MaterialView from "./components/MaterialView"
 import TestHistory from "./components/TestHistory";
 import GateChatbot from "./components/GateChatbot";
+import CommunityPage from './pages/CommunityPage';
 // ------------------------------------
 import PaperManagement from './components/PaperManagement';
 
@@ -75,6 +78,7 @@ function AppContent() {
         { id: 'tests', label: 'Mock Tests', icon: Settings, path: '/tests' },
         { id: 'progress', label: 'Progress', icon: BarChart3, path: '/progress' },
         { id: 'chatbot', label: 'AI Tutor', icon: BookOpen, path: '/chatbot' },
+        { id: 'community', label: 'Community', icon: User, path: '/community' },
         
         // { id: 'papers', label: 'Papers', icon: BookOpen, path: '/papers' },
     ];
@@ -249,6 +253,7 @@ const AuthenticatedRoutes = () => {
             <Route path="/tests" element={<MockTests />} />
             <Route path="/chatbot" element={<GateChatbot />} />
             <Route path="/history" element={<TestHistory />} />
+            <Route path="/community" element={<CommunityPage />} />
             {/* <Route path="/papers" element={<PaperManagement />} /> */}
             
             {/* Student-only route */}
@@ -324,11 +329,13 @@ function App() {
         <React.StrictMode>
             {/* 1. AuthProvider is the outermost context */}
             <AuthProvider> 
+               <SocketProvider>
                 {/* 2. BrowserRouter is required for React Router DOM */}
                 <BrowserRouter>
                     {/* 3. AppRouter handles all routing and provider nesting */}
                     <AppRouter />
                 </BrowserRouter>
+                </SocketProvider>
             </AuthProvider>
         </React.StrictMode>
     );

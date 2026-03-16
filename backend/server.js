@@ -6,6 +6,11 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const path = require('path');
 
+const db = require("./config/database");
+
+const http = require("http");
+const { Server  } = require("socket.io");
+
 // RESTORED DEPENDENCIES (from old server.js)
 const { connectDB } = require("./config/database"); // Assuming connectDB is exported from database.js
 const authRoutes = require('./routes/authRoutes'); // NEW AUTH ROUTES
@@ -18,10 +23,90 @@ const chatbotRoutes = require("./routes/chatbotRoutes");
 const systemAdminRoutes = require('./routes/SystemRoute'); 
 const fetchAdminRoutes = require('./routes/fetchAdminRoute');
 const adminHistoryRoutes = require("./routes/adminHistoryRoutes");
+const communityRoutes = require("./routes/communityRoutes");
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 
+// --- Socket.IO Setup for Real-Time Chat ---
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
+});
+
+app.set("io", io);
+
+io.on("connection", (socket) => {
+
+  console.log("User connected:", socket.id);
+
+  // Join personal room
+  socket.on("joinUserRoom", (userNo) => {
+
+    socket.join(`user_${userNo}`);
+
+    console.log(`User ${userNo} joined personal room`);
+
+  });
+
+  socket.on("typing", (data) => {
+
+  const { groupId, userNo } = data;
+
+  socket.to(`group_${groupId}`).emit("userTyping", {
+    groupId,
+    userNo
+  });
+
+});
+
+  // Join chat room
+  socket.on("joinRoom", (groupId) => {
+
+    socket.join(`group_${groupId}`);
+
+    console.log(`User joined group ${groupId}`);
+
+  });
+
+  // Send message
+  socket.on("sendMessage", async (data) => {
+
+    try {
+
+      const { groupId, senderId, message } = data;
+
+      await db.query(
+        `INSERT INTO group_messages (group_id, sender_user_no, message)
+         VALUES ($1,$2,$3)`,
+        [groupId, senderId, message]
+      );
+
+      io.to(`group_${groupId}`).emit("receiveMessage", {
+        groupId,
+        sender_user_no: senderId,
+        message,
+        created_at: new Date()
+      });
+
+    } catch (error) {
+
+      console.error("Socket message error:", error);
+
+    }
+
+  });
+
+  socket.on("disconnect", () => {
+
+    console.log("User disconnected:", socket.id);
+
+  });
+
+});
 // --- Security and Middleware ---
 
 // Security middleware
@@ -44,6 +129,7 @@ app.use(limiter);
 // Body parsing middleware (RESTORED from old server.js to handle larger bodies)
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
+
 
 
 
@@ -79,6 +165,10 @@ app.use('/public', express.static(path.join(__dirname, 'public'), {
     }
   }
 }));
+
+
+//community routes
+app.use("/api/community", communityRoutes);
 
 
 // --- API Routes ---
@@ -127,7 +217,7 @@ const startServer = async () => {
         await connectDB();
         console.log("Database connected successfully");
 
-        app.listen(PORT, () => {
+        server.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
             console.log(`Health check: http://localhost:${PORT}/health`);
         });

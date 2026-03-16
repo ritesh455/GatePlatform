@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const db = require("../config/database");
 
 // Controllers and Middleware
 const { register } = require('../controllers/authController'); 
@@ -36,6 +37,55 @@ const upload = multer({
 });
 
 
+router.get("/search-user", async (req, res) => {
+
+  try {
+
+    const { username } = req.query;
+
+    if (!username) {
+      return res.json({
+        success: false,
+        message: "Enter username to search"
+      });
+    }
+
+    const result = await db.query(
+      `
+      SELECT user_no, username
+      FROM student
+      WHERE username ILIKE $1
+      LIMIT 10
+      `,
+      [`%${username}%`]
+    );
+
+    if (result.rows.length === 0) {
+
+      return res.json({
+        success: false,
+        message: "User not found"
+      });
+
+    }
+
+    res.json({
+      success: true,
+      users: result.rows
+    });
+
+  } catch (error) {
+
+    console.error("Search user error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+
+  }
+
+});
 
 // ===============================================
 // === PRIMARY AUTH ROUTES (NEW) ===
