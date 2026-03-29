@@ -70,16 +70,11 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Assuming useAuth provides a way to check if the user is authenticated and an admin
-  // FIX 2: Used 'as unknown as' to resolve the type conflict warning/error.
   const { user, loading: authLoading } = useAuth() as unknown as AuthContextValueType
 
   const fetchDashboardData = useCallback(async () => {
     setError(null)
     setLoading(true)
-
-    // Optional: Add a check here if the user's role is not 'admin'
-    // if (user?.role !== 'admin') { return; } 
 
     try {
       const response = await apiService.getAdminDashboardData()
