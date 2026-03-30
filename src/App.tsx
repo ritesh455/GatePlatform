@@ -23,11 +23,11 @@ import { SocketProvider } from './contexts/SocketContext';
 import UserProfile from './components/UserProfile';
 
 // --- IMPORT ALL PAGES/COMPONENTS ---
-import HomePage from './pages/HomePage'; 
-import LoginPage from './pages/LoginPage'; 
-import RegisterPage from './pages/RegisterPage'; 
-import NotFound from './pages/NotFound';
-import SystemAdmin from './pages/SystemAdmin'; // From New App.tsx
+import HomePage from './screens/HomePage'; 
+import LoginPage from './screens/LoginPage'; 
+import RegisterPage from './screens/RegisterPage'; 
+import NotFound from './screens/NotFound';
+import SystemAdmin from './screens/SystemAdmin'; // From New App.tsx
 
 // --- IMPORT EXISTING APP COMPONENTS (kept for reference) ---
 import UserDashboard from './components/UserDashboard';
@@ -40,7 +40,7 @@ import ChapterManagement from './components/ChapterManagement';
 import MaterialView from "./components/MaterialView"
 import TestHistory from "./components/TestHistory";
 import GateChatbot from "./components/GateChatbot";
-import CommunityPage from './pages/CommunityPage';
+import CommunityPage from './screens/CommunityPage';
 // ------------------------------------
 import PaperManagement from './components/PaperManagement';
 
