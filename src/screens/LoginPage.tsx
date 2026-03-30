@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, BookOpen, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
   const { loginUser } = useAuth();
@@ -14,7 +15,7 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-
+const router = useRouter();
   // --- Real-time Validation State ---
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
@@ -36,9 +37,10 @@ const LoginPage = () => {
   };
 
   const navigate = (path: string) => {
-    window.history.pushState({}, '', path);
-    window.dispatchEvent(new Event('popstate'));
-  };
+  if (typeof window !== "undefined") {
+    router.push(path);
+  }
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

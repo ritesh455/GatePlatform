@@ -83,21 +83,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // Initial check to load user from storage (Old Context's useEffect)
     useEffect(() => {
-        const token = localStorage.getItem("userToken");
-        const storedUser = localStorage.getItem("user");
-        if (token && storedUser) {
-            try {
-                const parsedUser: User = JSON.parse(storedUser);
-                parsedUser.token = token; 
-                setUser(parsedUser);
-            } catch (e) {
-                console.error("Error parsing stored user data:", e);
-                localStorage.removeItem("userToken");
-                localStorage.removeItem("user");
-            }
+    if (typeof window === "undefined") return;
+
+    const token = localStorage.getItem("userToken");
+    const storedUser = localStorage.getItem("user");
+
+    if (token && storedUser) {
+        try {
+            const parsedUser: User = JSON.parse(storedUser);
+            parsedUser.token = token;
+            setUser(parsedUser);
+        } catch (e) {
+            localStorage.removeItem("userToken");
+            localStorage.removeItem("user");
         }
-        setAuthLoading(false);
-    }, []);
+    }
+
+    setAuthLoading(false);
+}, []);
 
     // API Functions (using useCallback for performance, as in New Context style)
 
