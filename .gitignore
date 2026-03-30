@@ -10,6 +10,8 @@
 # production
 /build
 
+backup.sql
+
 # debug
 npm-debug.log*
 yarn-debug.log*
