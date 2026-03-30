@@ -119,7 +119,7 @@ const createInviteLink = async (req, res) => {
   );
 
   res.json({
-    invite_link: `http://localhost:3000/join/${inviteCode}`
+    invite_link: `http://localhost:5173/join/${inviteCode}`
   });
 };
 
