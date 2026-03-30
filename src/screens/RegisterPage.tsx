@@ -1,4 +1,7 @@
 // src/pages/RegisterPage.tsx
+"use client";
+
+export const dynamic = "force-dynamic";
 import React, { useState, useMemo, useEffect } from 'react';
 import { User, Mail, Lock, BookOpen, Phone, Upload, Loader2, MapPin, Map, ChevronDown, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';

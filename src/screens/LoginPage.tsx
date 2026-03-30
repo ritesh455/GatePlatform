@@ -1,4 +1,7 @@
 // src/pages/LoginPage.tsx
+"use client";
+
+export const dynamic = "force-dynamic";
 import React, { useState } from 'react';
 import { Mail, Lock, BookOpen, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';

@@ -1,3 +1,6 @@
+"use client";
+
+export const dynamic = "force-dynamic";
 import { useState } from "react";
 import FindPartner from "../component/community/FindPartner";
 import IncomingRequests from "../component/community/IncomingRequests";
