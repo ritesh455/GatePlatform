@@ -72,7 +72,7 @@ function AppContent() {
 
     const userNavItems = [
         { id: 'dashboard', label: 'Dashboard', icon: BarChart3, path: '/dashboard' },
-        { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
+        // { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
         { id: 'chapters', label: 'Subjects', icon: BookOpen, path: '/chapters' },
         { id: 'study', label: 'Study Materials', icon: BookOpen, path: '/study' },
         { id: 'tests', label: 'Mock Tests', icon: Settings, path: '/tests' },
@@ -85,7 +85,7 @@ function AppContent() {
 
     const adminNavItems = [
         { id: 'dashboard', label: 'Dashboard', icon: BarChart3, path: '/dashboard' },
-         { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
+        //  { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
         { id: 'admin', label: 'Admin Panel', icon: Settings, path: '/admin' },
         { id: 'chapters', label: 'Subjects', icon: BookOpen, path: '/chapters' },
         { id: 'study', label: 'Study Materials', icon: BookOpen, path: '/study' },
