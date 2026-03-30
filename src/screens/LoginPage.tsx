@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import React, { useState } from 'react';
 import { Mail, Lock, BookOpen, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+
 
 const LoginPage = () => {
   const { loginUser } = useAuth();
@@ -18,7 +18,7 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-const router = useRouter();
+
   // --- Real-time Validation State ---
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
@@ -39,9 +39,9 @@ const router = useRouter();
     setTouched(prev => ({ ...prev, [field]: true }));
   };
 
-  const navigate = (path: string) => {
+ const navigate = (path: string) => {
   if (typeof window !== "undefined") {
-    router.push(path);
+    window.location.href = path;
   }
 };
 
