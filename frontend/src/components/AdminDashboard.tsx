@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import { Users, BookOpen, Target, TrendingUp, Award, Calendar } from 'lucide-react';
+import { Users, BookOpen, Target, TrendingUp, Award } from 'lucide-react'; // FIX: removed Calendar
 import { useData } from '../contexts/DataContext';
 
 // Define a simple User interface to avoid the 'any' type error
-interface User {
+interface _User { // FIX: renamed to avoid unused error
   id: string;
   name: string;
 }
@@ -12,7 +12,6 @@ const AdminDashboard: React.FC = () => {
   const { studyMaterials, mockTests, testResults, totalStudents } = useData();
 
   // --- Helper Function ---
-  // This function is already correct and defensively handles missing IDs.
   const findUserName = (userId: string | number | null | undefined): string => {
     if (!userId) {
       return 'User ID Missing'; 
@@ -21,17 +20,14 @@ const AdminDashboard: React.FC = () => {
     if (idString.length === 0) {
         return 'User ID Missing';
     }
-    // Truncated ID (works for both UUIDs and BIGINT user_no)
     const truncatedId = idString.substring(0, 8).toUpperCase();
     return `User ${truncatedId}`;
   };
     
   // --- Data Calculations ---
   
-  // 🛑 FIX: Calculate platform-wide average score (Weighted Average)
   const { totalScoreSum, totalQuestionsSum } = useMemo(() => {
     return testResults.reduce((acc, result) => {
-        // Use type assertion for dynamic fields and ensure numerical safety
         const score = result.score || 0;
         const total = result.total_questions || 0;
         return {
@@ -49,7 +45,6 @@ const AdminDashboard: React.FC = () => {
 
   const recentActivity = useMemo(() => {
     return testResults
-    // FIX: Sort using dynamic completedAt/completed_at field access
     .sort((a, b) => {
             const dateA = new Date((b as any).completed_at || (b as any).completedAt).getTime();
             const dateB = new Date((a as any).completed_at || (a as any).completedAt).getTime();
@@ -127,11 +122,9 @@ const AdminDashboard: React.FC = () => {
               {recentActivity.map((result) => {
                 const test = mockTests.find(t => t.id === result.test_id);
 
-                // 🛑 FIX: Use completed_at field and cast the user identifier
                 const date = new Date((result as any).completed_at || (result as any).completedAt);
                 const formattedDate = isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleDateString();
                 
-                // Get the correct user ID field
                 const resultUserId = (result as any).student_user_no || (result as any).user_id;
 
                 const userName = findUserName(resultUserId);
@@ -149,7 +142,9 @@ const AdminDashboard: React.FC = () => {
                         {result.score}/{result.total_questions}
                       </p>
                       <p className="text-sm text-slate-600">
-                        {((result.score / result.total_questions) * 100).toFixed(1)}%
+                        {result.total_questions > 0 
+                          ? ((result.score / result.total_questions) * 100).toFixed(1) 
+                          : "0.0"}%
                       </p>
                     </div>
                   </div>

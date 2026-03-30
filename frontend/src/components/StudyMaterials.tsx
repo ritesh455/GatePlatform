@@ -1,55 +1,77 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { BookOpen, Search, Filter, Edit, Trash2, Plus, Eye, X } from "lucide-react"
 import { useData } from "../contexts/DataContext"
 import { useAuth } from "../contexts/AuthContext"
 import { useNavigate } from "react-router-dom"
 
+// Define the interface for StudyMaterial to ensure strict typing
+interface StudyMaterial {
+  id: string
+  title: string
+  subject: string
+  content: string
+  difficulty: "Easy" | "Medium" | "Hard"
+}
+
 const StudyMaterials: React.FC = () => {
-  const { studyMaterials, addStudyMaterial, updateStudyMaterial, deleteStudyMaterial, loading } = useData()
+  const { studyMaterials = [], addStudyMaterial, updateStudyMaterial, deleteStudyMaterial, loading } = useData()
   const { user } = useAuth()
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedSubject, setSelectedSubject] = useState("")
-  const [showAddForm, setShowAddForm] = useState(false)
+  const navigate = useNavigate()
+
+  const [searchTerm, setSearchTerm] = useState<string>("")
+  const [selectedSubject, setSelectedSubject] = useState<string>("")
+  const [showAddForm, setShowAddForm] = useState<boolean>(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [formData, setFormData] = useState({
+  
+  const [formData, setFormData] = useState<{
+    title: string
+    subject: string
+    content: string
+    difficulty: "Easy" | "Medium" | "Hard"
+  }>({
     title: "",
     subject: "",
     content: "",
-    difficulty: "Easy" as "Easy" | "Medium" | "Hard",
+    difficulty: "Easy",
   })
 
-  const subjects = [...new Set(studyMaterials.map((m) => m.subject))]
+  // Use useMemo for subjects to prevent unnecessary re-calculations
+  const subjects = useMemo(() => {
+    return [...new Set(studyMaterials.map((m) => m.subject))].filter(Boolean)
+  }, [studyMaterials])
 
-const filteredMaterials = studyMaterials.filter(
-  (material) =>
-    (material.title?.toLowerCase() ?? "")  // ← safe access
-      .includes(searchTerm.toLowerCase()) &&
-    (selectedSubject === "" || material.subject === selectedSubject),
-);
-const navigate = useNavigate();
+  const filteredMaterials = studyMaterials.filter(
+    (material) =>
+      (material.title?.toLowerCase() ?? "")
+        .includes(searchTerm.toLowerCase()) &&
+      (selectedSubject === "" || material.subject === selectedSubject),
+  )
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
+    if (editingId) {
+      await updateStudyMaterial(editingId, formData)
+      setEditingId(null)
+    } else {
+      await addStudyMaterial(formData)
+    }
 
-  if (editingId) {
-    await updateStudyMaterial(editingId, formData)
-    setEditingId(null)
-  } else {
-    await addStudyMaterial(formData)  // ✅ here
+    setFormData({ title: "", subject: "", content: "", difficulty: "Easy" })
+    setShowAddForm(false)
   }
 
-  setFormData({ title: "", subject: "", content: "", difficulty: "Easy" })
-  setShowAddForm(false)
-}
-
-
-
-  const handleEdit = (material: any) => {
-    setFormData(material)
+  // FIXED: Replaced 'any' with the local interface 'StudyMaterial'
+  const handleEdit = (material: StudyMaterial) => {
+    setFormData({
+      title: material.title,
+      subject: material.subject,
+      content: material.content,
+      difficulty: material.difficulty,
+    })
     setEditingId(material.id)
     setShowAddForm(true)
   }
@@ -101,7 +123,6 @@ const handleSubmit = async (e: React.FormEvent) => {
               )}
             </div>
 
-            {/* Search and Filter */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1 relative">
@@ -123,18 +144,16 @@ const handleSubmit = async (e: React.FormEvent) => {
                   >
                     <option value="">All Subjects</option>
                     {subjects.map((subject, index) => (
-  <option key={subject ?? index} value={subject ?? ""}>
-    {subject ?? "Unknown"}
-  </option>
-))}
-
+                      <option key={subject ?? index} value={subject ?? ""}>
+                        {subject ?? "Unknown"}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Add/Edit Form */}
           {showAddForm && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -210,38 +229,8 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
           )}
 
-          {/* View Material Modal
-          {viewingMaterial && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-slate-900">{viewingMaterial.title}</h2>
-                  <button
-                    onClick={() => setViewingMaterial(null)}
-                    className="text-slate-400 hover:text-slate-600 transition-colors"
-                  >
-                    <X size={24} />
-                  </button>
-                </div>
-                <div className="mb-4">
-                  <span className="text-sm text-slate-600">Subject: </span>
-                  <span className="font-medium">{viewingMaterial.subject}</span>
-                  <span
-                    className={`ml-4 px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(viewingMaterial.difficulty)}`}
-                  >
-                    {viewingMaterial.difficulty}
-                  </span>
-                </div>
-                <div className="prose max-w-none">
-                  <div className="whitespace-pre-wrap text-slate-700">{viewingMaterial.content}</div>
-                </div>
-              </div>
-            </div>
-          )} */}
-
-          {/* Materials Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-           {filteredMaterials.map((material, index) => (
+            {filteredMaterials.map((material, index) => (
               <div
                 key={material.id || `fallback-${index}`}
                 className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow"
@@ -260,9 +249,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                 </div>
 
                 <p className="text-slate-600 text-sm mb-4 line-clamp-3">
-  {(material.content ?? "").slice(0, 150)}...
-</p>
-
+                  {(material.content ?? "").slice(0, 150)}...
+                </p>
 
                 <div className="flex items-center justify-between">
                   <button
@@ -276,7 +264,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   {user?.role === "admin" && (
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleEdit(material)}
+                        onClick={() => handleEdit(material as StudyMaterial)}
                         className="p-2 text-slate-600 hover:text-blue-600 transition-colors"
                       >
                         <Edit size={16} />

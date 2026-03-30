@@ -60,7 +60,7 @@ margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
 />
 {/* 🛑 Tooltip FIX */}
 <Tooltip
-  formatter={(value: any, name: any, props: any) => {
+  formatter={(value: any, _name: any, props: any) => {
     const payloadItem = props?.payload?.[0]?.payload as ChartData;
     return [`${Number(value).toFixed(1)}%`, payloadItem?.name || 'Accuracy'];
   }}
@@ -156,7 +156,7 @@ const Progress: React.FC = () => {
 }, [userResults, mockTests]);
 
 
-  const getPerformanceColor = (accuracy: number) => {
+  const _getPerformanceColor = (accuracy: number) => {
     if (accuracy >= 80) return 'text-green-600';
     if (accuracy >= 60) return 'text-yellow-600';
     return 'text-red-600';
