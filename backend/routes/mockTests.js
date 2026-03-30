@@ -97,7 +97,6 @@ router.post(
     body("description").optional().trim(),
     body("duration").isInt({ min: 1 }).withMessage("Duration must be a positive integer"),
     // 5. Add validation for the new 'branch' field
-    body("branch").trim().isLength({ min: 1 }).withMessage("Target branch is required"),
     body("questions").optional().isArray().withMessage("Questions must be an array"),
     body("questions.*.question").optional().trim().isLength({ min: 1 }).withMessage("Question text is required"),
     body("questions.*.options").optional().isArray({ min: 2 }).withMessage("At least 2 options are required"),
@@ -117,8 +116,8 @@ router.post(
       }
 
       // 6. Destructure the new branch field
-      const { title, description, duration, branch, questions = [] } = req.body
-
+      const { title, description, duration , questions = [] } = req.body
+      const branch = req.user.branch;
       // Start transaction
       const client = await require("../config/database").pool.connect()
       try {
