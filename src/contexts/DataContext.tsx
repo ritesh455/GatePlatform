@@ -206,7 +206,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const chaptersWithUrls = chaptersRes.data.map((chapter: any) => {
             const pdfNotes = (chapter.pdf_note || []).map((pdf: any) => ({
               ...pdf,
-              url: `${process.env.REACT_APP_API_URL_WITHOUT_API || "http://localhost:5000"}${pdf.url}`,
+              url: pdf.url,
             }));
 
             return {
@@ -428,8 +428,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.success && response.data) {
         const newPdfNote = {
           ...response.data,
-          url: `${process.env.REACT_APP_API_URL_WITHOUT_API || "http://localhost:5000"}${response.data.url}`,
-        };
+          url: response.data.url.startsWith("http")
+    ? response.data.url
+    : `${process.env.REACT_APP_API_URL_WITHOUT_API || "http://localhost:5000"}${response.data.url}`,
+};
 
         setChapters((prev) =>
           prev.map((c) =>

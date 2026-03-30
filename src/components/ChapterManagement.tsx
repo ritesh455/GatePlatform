@@ -535,11 +535,15 @@ const ChapterManagement: React.FC = () => {
                             <div className="flex items-center space-x-2">
                               {/* **FIX:** Change the `<a>` tag to open the PDF in a new tab */}
                               {/* http://localhost:5000/public/7dbb3fc3dd1023dd5e626ae894095fe2.pdf */}
-                              <button
+                              {/* <button
                                 onClick={async () => {
                                   try {
                                     // Use the API helper that fetches the PDF with auth and opens in a new tab
-                                    await apiService.openPdfInNewTab(chapter.id, pdf.id);
+                                    // await apiService.openPdfInNewTab(chapter.id, pdf.id);
+                                    if (pdf.url) {
+                                            const fixedUrl = pdf.url.replace("/image/upload/", "/raw/upload/");
+                                            window.open(fixedUrl, "_blank");
+                                        }
                                   } catch (err) {
                                     console.error('Failed to open PDF:', err);
                                     // Fallback: open the raw URL if available
@@ -550,7 +554,26 @@ const ChapterManagement: React.FC = () => {
                                 aria-label={`Open ${pdf.file_name}`}
                               >
                                 <FileText size={16} />
-                              </button>
+                              </button> */}
+
+                              <button
+  onClick={() => {
+    console.log(pdf.url);
+    if (pdf.url) {
+  let fixedUrl = pdf.url;
+
+  // Fix https issue
+  if (fixedUrl.startsWith("https//")) {
+    fixedUrl = fixedUrl.replace("https//", "https://");
+  } 
+
+  window.open(fixedUrl, "_blank");
+}
+  }}
+  className="p-2 text-blue-600 hover:text-blue-700"
+>
+  <FileText size={16} />
+</button>
 
                               {user?.role === 'admin' && (
                                 <button onClick={() => removePdfFromChapter(chapter.id, pdf.id)} className="p-2 text-red-600 hover:text-red-700 transition-colors">

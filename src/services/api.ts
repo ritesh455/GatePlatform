@@ -368,30 +368,35 @@ async getTestResults(studentUserNo?: string | number) {
 
   // Open a protected PDF in a new tab by fetching it with the Authorization header
   // and creating an object URL so the browser can display it inline.
-  async openPdfInNewTab(chapterId: string, pdfId: string) {
-    try {
-      const token = localStorage.getItem("userToken");
-      const headers: HeadersInit = {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      };
+  // async openPdfInNewTab(chapterId: string, pdfId: string) {
+  //   try {
+  //     const token = localStorage.getItem("userToken");
+  //     const headers: HeadersInit = {
+  //       ...(token && { Authorization: `Bearer ${token}` }),
+  //     };
 
-      const url = `${API_BASE_URL}/chapters/${chapterId}/pdfs/${pdfId}/open`;
-      const res = await fetch(url, { headers });
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        throw new Error(`Failed to fetch PDF: ${res.status} ${res.statusText} ${text}`);
-      }
+  //     const url = `${API_BASE_URL}/chapters/${chapterId}/pdfs/${pdfId}/open`;
+  //     const res = await fetch(url, { headers });
+  //     if (!res.ok) {
+  //       const text = await res.text().catch(() => "");
+  //       throw new Error(`Failed to fetch PDF: ${res.status} ${res.statusText} ${text}`);
+  //     }
 
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      window.open(blobUrl, "_blank");
-      // Optionally revokeObjectURL after some time to free memory
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
-    } catch (err) {
-      console.error("openPdfInNewTab error:", err);
-      throw err;
-    }
-  }
+  //     const blob = await res.blob();
+  //     const blobUrl = URL.createObjectURL(blob);
+  //     window.open(blobUrl, "_blank");
+  //     // Optionally revokeObjectURL after some time to free memory
+  //     setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+  //   } catch (err) {
+  //     console.error("openPdfInNewTab error:", err);
+  //     throw err;
+  //   }
+  // }
+
+  openPdfInNewTab(chapterId: string, pdfId: string) {
+  const url = `${API_BASE_URL}/chapters/${chapterId}/pdfs/${pdfId}/open`;
+  window.open(url, "_blank");
+}
 
   // --- Chapter Videos ---
   async addVideoToChapter(chapterId: string, video: any) {
