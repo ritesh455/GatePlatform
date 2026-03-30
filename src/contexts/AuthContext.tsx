@@ -71,7 +71,7 @@ export const useAuth = (): AuthContextValue => {
 // --- 4. The Provider Component (Combined Logic) ---
 
 // Assuming backend runs on port 5000
-const API_BASE_URL = "http://localhost:5000/api/auth";
+const API_BASE_URL = "https://gateplatform.onrender.com/api/auth";
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 

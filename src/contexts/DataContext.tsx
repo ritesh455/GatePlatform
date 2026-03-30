@@ -150,7 +150,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log("[v0] Starting data load for authenticated user...");
         console.log(
           "[v0] API Base URL:",
-          process.env.REACT_APP_API_URL || "http://localhost:5000/api"
+          process.env.REACT_APP_API_URL || "https://gateplatform.onrender.com/api"
         );
 
         const [materialsRes, testsRes, resultsRes, chaptersRes] = await Promise.all([
@@ -430,7 +430,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ...response.data,
           url: response.data.url.startsWith("http")
     ? response.data.url
-    : `${process.env.REACT_APP_API_URL_WITHOUT_API || "http://localhost:5000"}${response.data.url}`,
+    : `${process.env.REACT_APP_API_URL_WITHOUT_API || "https://gateplatform.onrender.com"}${response.data.url}`,
 };
 
         setChapters((prev) =>

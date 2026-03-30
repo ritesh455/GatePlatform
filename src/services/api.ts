@@ -1,6 +1,6 @@
 "use client";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL! || "https://gateplatform.onrender.com/api"; // Ensure this is set in your .env file
 
 // --- CORE INTERFACES ---
 

@@ -19,7 +19,7 @@ export default function SearchUser() {
 
       setIsSearching(true);
       const res = await fetch(
-        `http://localhost:5000/api/auth/search-user?username=${username}`
+        `https://gateplatform.onrender.com/api/auth/search-user?username=${username}`
       );
 
       const data = await res.json();

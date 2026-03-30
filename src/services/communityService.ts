@@ -1,4 +1,4 @@
-const API = "http://localhost:5000/api/community";
+const API = "https://gateplatform.onrender.com/api/community";
 
 export const getCommunityAccess = async (token: string) => {
 
@@ -13,7 +13,7 @@ export const getCommunityAccess = async (token: string) => {
 
 export const findRandomPartner = async (token: string) => {
 
-  const res = await fetch("http://localhost:5000/api/community/find-random-partner", {
+  const res = await fetch("https://gateplatform.onrender.com/api/community/find-random-partner", {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${token}`,
@@ -27,7 +27,7 @@ export const findRandomPartner = async (token: string) => {
 export const sendStudyRequest = async (token: string, receiver: number) => {
   try {
     const res = await fetch(
-      "http://localhost:5000/api/community/send-study-request",
+      "https://gateplatform.onrender.com/api/community/send-study-request",
       {
         method: "POST",
         headers: {
@@ -54,7 +54,7 @@ export const sendStudyRequest = async (token: string, receiver: number) => {
 export const getIncomingRequests = async (token: string) => {
 
   const res = await fetch(
-    "http://localhost:5000/api/community/incoming-requests",
+    "https://gateplatform.onrender.com/api/community/incoming-requests",
     {
       headers: {
         Authorization: `Bearer ${token}`
@@ -71,7 +71,7 @@ export const acceptStudyRequest = async (
 ) => {
 
   const res = await fetch(
-    "http://localhost:5000/api/community/accept-request",
+    "https://gateplatform.onrender.com/api/community/accept-request",
     {
       method: "POST",
       headers: {
@@ -88,7 +88,7 @@ export const acceptStudyRequest = async (
 export const getMyChats = async (token: string) => {
 
   const res = await fetch(
-    "http://localhost:5000/api/community/my-chats",
+    "https://gateplatform.onrender.com/api/community/my-chats",
     {
       headers: {
         Authorization: `Bearer ${token}`
@@ -106,7 +106,7 @@ export const getChatMessages = async (
 ) => {
 
   const res = await fetch(
-    `http://localhost:5000/api/community/chat/${roomId}/messages`,
+    `https://gateplatform.onrender.com/api/community/chat/${roomId}/messages`,
     {
       headers: {
         Authorization: `Bearer ${token}`
@@ -124,7 +124,7 @@ export const unfriend = async (
 ) => {
 
   const res = await fetch(
-    "http://localhost:5000/api/community/unfriend",
+    "https://gateplatform.onrender.com/api/community/unfriend",
     {
       method: "POST",
       headers: {
@@ -145,7 +145,7 @@ export const leaveChat = async (
 ) => {
 
   const res = await fetch(
-    "http://localhost:5000/api/community/leave-chat",
+    "https://gateplatform.onrender.com/api/community/leave-chat",
     {
       method: "POST",
       headers: {

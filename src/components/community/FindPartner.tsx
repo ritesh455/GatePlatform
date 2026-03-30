@@ -16,7 +16,7 @@ export default function FindPartner() {
   const findWeakPartner = async () => {
     if (!user) return;
     const res = await fetch(
-      "http://localhost:5000/api/community/find-weakness-partner",
+      "https://gateplatform.onrender.com/api/community/find-weakness-partner",
       {
         headers: {
           Authorization: `Bearer ${user.token}`
