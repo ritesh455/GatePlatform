@@ -74,6 +74,8 @@ const ChapterManagement: React.FC = () => {
   const [pdfForm, setPdfForm] = useState<{ title: string; file: File | null }>({ title: '', file: null });
   const [videoForm, setVideoForm] = useState({ title: '', youtubeUrl: '', duration: '' });
 
+  const [videoLoading, setVideoLoading] = useState(false);
+
   // Extract unique subjects for the filter dropdown
   const uniqueSubjects = useMemo(() => {
     const subjects = new Set<string>();
@@ -131,27 +133,65 @@ const ChapterManagement: React.FC = () => {
     setShowAddChapter(false);
   };
 
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  // const handleAddPdf = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (selectedChapterId && pdfForm.file) {
+  //     // Correct the property name from 'title' to 'file_name'
+  //     const pdfData = { file_name: pdfForm.title, file: pdfForm.file };
+  //     await addPdfToChapter(selectedChapterId, pdfData);
+  //   }
+  //   setPdfForm({ title: '', file: null });
+  //   setShowAddPdf(false);
+  //   setSelectedChapterId('');
+  // };
   const handleAddPdf = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (selectedChapterId && pdfForm.file) {
-      // Correct the property name from 'title' to 'file_name'
+  e.preventDefault();
+
+  if (selectedChapterId && pdfForm.file) {
+    try {
+      setPdfLoading(true); // ✅ START LOADING
+
       const pdfData = { file_name: pdfForm.title, file: pdfForm.file };
       await addPdfToChapter(selectedChapterId, pdfData);
-    }
-    setPdfForm({ title: '', file: null });
-    setShowAddPdf(false);
-    setSelectedChapterId('');
-  };
 
-  const handleAddVideo = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (selectedChapterId) {
-      await addVideoToChapter(selectedChapterId, videoForm);
+      alert("PDF added successfully ✅"); // ✅ SUCCESS MESSAGE
+    } catch (error) {
+      console.error(error);
+      alert("Failed to upload PDF ❌");
+    } finally {
+      setPdfLoading(false); // ✅ STOP LOADING
     }
-    setVideoForm({ title: '', youtubeUrl: '', duration: '' });
-    setShowAddVideo(false);
-    setSelectedChapterId('');
-  };
+  }
+
+  setPdfForm({ title: '', file: null });
+  setShowAddPdf(false);
+  setSelectedChapterId('');
+};
+
+const handleAddVideo = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (selectedChapterId) {
+    try {
+      setVideoLoading(true); // ✅ START LOADING
+
+      await addVideoToChapter(selectedChapterId, videoForm);
+
+      alert("Video added successfully ✅"); // ✅ SUCCESS
+    } catch (error) {
+      console.error(error);
+      alert("Failed to add video ❌");
+    } finally {
+      setVideoLoading(false); // ✅ STOP LOADING
+    }
+  }
+
+  setVideoForm({ title: '', youtubeUrl: '', duration: '' });
+  setShowAddVideo(false);
+  setSelectedChapterId('');
+};
 
   const handleEditChapter = (chapter: any) => {
     setChapterForm({ chapter_number: chapter.chapter_number, chapter_title: chapter.chapter_title });
@@ -341,11 +381,16 @@ const ChapterManagement: React.FC = () => {
                   Cancel
                 </button>
                 <button
-                  type="submit"
-                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200"
-                >
-                  Add PDF
-                </button>
+  type="submit"
+  disabled={pdfLoading}
+  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg flex items-center justify-center"
+>
+  {pdfLoading ? (
+    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+  ) : (
+    "Add PDF"
+  )}
+</button>
               </div>
                <X 
                   className="absolute top-3 right-3 w-5 h-5 text-slate-400 cursor-pointer hover:text-slate-700"
@@ -410,12 +455,17 @@ const ChapterManagement: React.FC = () => {
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200"
-                >
-                  Add Video
-                </button>
+              <button
+  type="submit"
+  disabled={videoLoading}
+  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg flex items-center justify-center"
+>
+  {videoLoading ? (
+    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+  ) : (
+    "Add Video"
+  )}
+</button>
               </div>
               <X 
                   className="absolute top-3 right-3 w-5 h-5 text-slate-400 cursor-pointer hover:text-slate-700"
@@ -576,7 +626,7 @@ const ChapterManagement: React.FC = () => {
 </button>
 
                               {user?.role === 'admin' && (
-                                <button onClick={() => removePdfFromChapter(chapter.id, pdf.id)} className="p-2 text-red-600 hover:text-red-700 transition-colors">
+                                <button onClick={() => { removePdfFromChapter(chapter.id, pdf.id); alert("PDF removed successfully ❌"); }} className="p-2 text-red-600 hover:text-red-700 transition-colors">
                                   <X size={16} />
                                 </button>
                               )}
@@ -622,7 +672,7 @@ const ChapterManagement: React.FC = () => {
                                 </a>
 
                                 {user?.role === 'admin' && (
-                                  <button onClick={() => removeVideoFromChapter(chapter.id, video.id)} className="p-2 text-red-600 hover:text-red-700 transition-colors">
+                                  <button onClick={() => { removeVideoFromChapter(chapter.id, video.id); alert("Video removed successfully ❌"); }} className="p-2 text-red-600 hover:text-red-700 transition-colors">
                                     <X size={16} />
                                   </button>
                                 )}

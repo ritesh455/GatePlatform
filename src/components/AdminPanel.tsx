@@ -58,6 +58,7 @@ const AdminPanel: React.FC = () => {
     }
     setMaterialForm({ title: '', subject: '', content: '', difficulty: 'Easy' });
     setShowAddMaterial(false);
+    alert(`Material ${editingMaterial ? 'updated' : 'created'} successfully ✅`);
   };
 
   const handleAddTest = (e: React.FormEvent) => {
@@ -70,6 +71,7 @@ const AdminPanel: React.FC = () => {
     }
     setTestForm({ title: '', description: '', duration: 30, questions: [] });
     setShowAddTest(false);
+    alert(`Test ${editingTest ? 'updated' : 'created'} successfully ✅`);
   };
 
   const handleAddQuestion = (e: React.FormEvent) => {
@@ -196,7 +198,7 @@ const AdminPanel: React.FC = () => {
                             <Edit size={16} />
                           </button>
                           <button
-                            onClick={() => deleteStudyMaterial(material.id)}
+                            onClick={() => { deleteStudyMaterial(material.id); alert("Study material deleted"); }}
                             className="text-red-600 hover:text-red-900 transition-colors"
                           >
                             <Trash2 size={16} />
@@ -275,7 +277,7 @@ const AdminPanel: React.FC = () => {
                             <Edit size={16} />
                           </button>
                           <button
-                            onClick={() => deleteMockTest(test.id)}
+                            onClick={() => {deleteMockTest(test.id); alert("Mock test deleted")}}
                             className="text-red-600 hover:text-red-900 transition-colors"
                           >
                             <Trash2 size={16} />
@@ -339,7 +341,7 @@ const AdminPanel: React.FC = () => {
             {testResults.length > 0 ? (
               <div className="space-y-3">
                 {testResults
-                  .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
+                  .sort((a, b) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime())
                   .slice(0, 10)
                   .map((result) => {
                     const test = mockTests.find(t => t.id === result.test_id);
@@ -349,7 +351,7 @@ const AdminPanel: React.FC = () => {
                         <div>
                           <p className="font-medium text-slate-900">{test?.title || 'Unknown Test'}</p>
                           <p className="text-sm text-slate-600">
-                            {new Date(result.completedAt).toLocaleDateString()}
+                            {new Date(result.completed_at).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="text-right">

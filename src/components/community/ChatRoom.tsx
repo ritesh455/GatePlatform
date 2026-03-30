@@ -7,13 +7,12 @@ import { FaUserMinus, FaPaperPlane, FaHashtag, FaInfoCircle } from "react-icons/
 export default function ChatRoom({ groupId }: any) {
   const socket = useSocket();
   const { user } = useAuth();
-  const scrollRef = useRef<HTMLDivElement>(null); // Added for smooth auto-scroll
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
-  const [typingUser, setTypingUser] = useState<number | null>(null);
+  const [typingUser, setTypingUser] = useState<any>(null);
 
-  // Auto-scroll logic (does not interfere with your logic)
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, typingUser]);
@@ -34,11 +33,10 @@ export default function ChatRoom({ groupId }: any) {
     if (!user || !socket) return;
     socket.emit("typing", {
       groupId,
-      userNo: user.userNo
+      userNo: user.userNo,
     });
   };
 
-  // Load old messages - Logic preserved
   useEffect(() => {
     const loadMessages = async () => {
       if (!user) return;
@@ -52,7 +50,6 @@ export default function ChatRoom({ groupId }: any) {
     loadMessages();
   }, [groupId, user]);
 
-  // Join room + listen messages - Logic preserved
   useEffect(() => {
     if (!socket) return;
     socket.emit("joinRoom", groupId);
@@ -94,12 +91,12 @@ export default function ChatRoom({ groupId }: any) {
       {/* CHAT HEADER */}
       <header className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-200">
+          <div className="h-10 w-10 rounded-full bg-green-600 flex items-center justify-center text-white shadow-lg shadow-green-200">
             <FaHashtag className="text-sm" />
           </div>
           <div>
             <h2 className="font-black text-slate-800 tracking-tight leading-none uppercase text-sm">Study Room</h2>
-            <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Group ID: {groupId}</p>
+            <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Chat ID: {groupId}</p>
           </div>
         </div>
 
@@ -119,40 +116,48 @@ export default function ChatRoom({ groupId }: any) {
       >
         <div className="flex justify-center mb-6">
           <span className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-100 text-[10px] text-slate-400 font-bold uppercase tracking-widest shadow-sm">
-            <FaInfoCircle className="text-blue-400" /> Start of conversation
+            <FaInfoCircle className="text-green-500" /> Start of conversation
           </span>
         </div>
 
         {messages.map((m, i) => {
-          const isMe = m.sender_user_no === user?.userNo;
-          return (
-            <div key={i} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
-              <div className={`max-w-[80%] sm:max-w-[70%] p-4 rounded-3xl shadow-sm text-sm leading-relaxed ${
-                isMe 
-                ? 'bg-blue-600 text-white rounded-tr-md' 
-                : 'bg-white text-slate-700 border border-slate-100 rounded-tl-md'
-              }`}>
-                {!isMe && (
-                  <p className="text-[10px] font-black uppercase tracking-tighter text-blue-500 mb-1">
-                    User {m.sender_user_no}
-                  </p>
-                )}
-                <p className="font-medium">{m.message}</p>
-              </div>
-            </div>
-          );
-        })}
+  // We check both sender_user_no (from DB) and senderId (from Socket)
+  // We also ensure user exists to avoid errors
+  const isMe = user?.userNo && (
+    Number(m.sender_user_no) === Number(user.userNo) || 
+    Number(m.senderId) === Number(user.userNo) ||
+    Number(m.sender_id) === Number(user.userNo) // Added just in case
+  );
+
+  return (
+    <div key={i} className={`flex w-full ${isMe ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+      <div className={`max-w-[80%] sm:max-w-[70%] p-4 rounded-3xl shadow-sm text-sm leading-relaxed ${
+        isMe 
+        ? 'bg-green-600 text-white rounded-tr-sm' 
+        : 'bg-white text-slate-700 border border-slate-100 rounded-tl-sm'
+      }`}>
+        {/* Only show "Partner" label if it's NOT me */}
+        {!isMe && (
+          <p className="text-[10px] font-black uppercase tracking-tighter text-green-600 mb-1">
+           {/* {m.username ? m.username : `User ${m.sender_user_no || m.senderId}`} */}
+          </p>
+        )}
+        <p className="font-medium">{m.message}</p>
+      </div>
+    </div>
+  );
+})}
 
         {/* Typing Indicator */}
-        {typingUser && (
+        {typingUser && typingUser !== user?.userNo && (
           <div className="flex items-center gap-2 animate-pulse pl-2">
             <div className="flex gap-1">
-              <span className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce"></span>
-              <span className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce delay-100"></span>
-              <span className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce delay-200"></span>
+              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-bounce"></span>
+              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-bounce delay-100"></span>
+              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-bounce delay-200"></span>
             </div>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-              User {typingUser} is typing...
+              Partner is typing...
             </p>
           </div>
         )}
@@ -166,11 +171,11 @@ export default function ChatRoom({ groupId }: any) {
             onChange={(e) => handleTyping(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             placeholder="Type your message..."
-            className="flex-1 bg-slate-50 border border-slate-200 rounded-[1.5rem] px-6 py-4 text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400 font-medium"
+            className="flex-1 bg-slate-50 border border-slate-200 rounded-[1.5rem] px-6 py-4 text-sm focus:ring-4 focus:ring-green-500/10 focus:border-green-500 outline-none transition-all placeholder:text-slate-400 font-medium"
           />
           <button
             onClick={sendMessage}
-            className="h-[52px] w-[52px] flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-xl shadow-blue-200 active:scale-90 transition-all shrink-0"
+            className="h-[52px] w-[52px] flex items-center justify-center bg-green-600 hover:bg-green-700 text-white rounded-2xl shadow-xl shadow-green-200 active:scale-90 transition-all shrink-0"
           >
             <FaPaperPlane className="text-lg translate-x-[-1px] translate-y-[1px]" />
           </button>

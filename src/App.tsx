@@ -77,7 +77,7 @@ function AppContent() {
         { id: 'study', label: 'Study Materials', icon: BookOpen, path: '/study' },
         { id: 'tests', label: 'Mock Tests', icon: Settings, path: '/tests' },
         { id: 'progress', label: 'Progress', icon: BarChart3, path: '/progress' },
-        { id: 'chatbot', label: 'AI Tutor', icon: BookOpen, path: '/chatbot' },
+        { id: 'chatbot', label: 'Ask Anything', icon: BookOpen, path: '/chatbot' },
         { id: 'community', label: 'Community', icon: User, path: '/community' },
         
         // { id: 'papers', label: 'Papers', icon: BookOpen, path: '/papers' },

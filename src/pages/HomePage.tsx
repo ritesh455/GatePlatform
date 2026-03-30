@@ -134,13 +134,13 @@ const HomePage = () => {
         <div className="max-w-4xl mx-auto">
 
           <h1 className="text-5xl md:text-6xl font-extrabold mb-6">
-            Crack GATE with
+            Preparation Platform with
             <span className="text-green-600"> Confidence</span>
           </h1>
 
           <p className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto">
             Personalized learning platform designed to help students prepare
-            smarter for the GATE exam using adaptive tests, analytics,
+            smarter for the exam using adaptive tests, analytics,
             and structured learning.
           </p>
 

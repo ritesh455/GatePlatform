@@ -50,6 +50,7 @@ const MockTests: React.FC = () => {
 
     setFormData({ title: '', description: '', duration: 30, questions: [] });
     setShowAddForm(false);
+    alert(`Test ${editingId ? 'updated' : 'created'} successfully ✅`);
   };
 
   const handleEdit = (test: MockTest) => {
