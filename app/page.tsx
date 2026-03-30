@@ -1,11 +1,14 @@
-"use client"
+"use client";
 
-import dynamic from "next/dynamic";
+import App from "../src/App";
+import { AuthProvider } from "../src/contexts/AuthContext";
 
-const App = dynamic(() => import("../src/App"), {
-  ssr: false,
-});
+export const dynamic = "force-dynamic";
 
 export default function Page() {
-  return <App />;
+  return (
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  );
 }
