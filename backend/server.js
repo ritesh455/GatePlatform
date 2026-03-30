@@ -36,7 +36,11 @@ app.get("/", (req, res) => {
 // --- Socket.IO Setup for Real-Time Chat ---
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    // origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: [
+      process.env.FRONTEND_URL,
+      "http://localhost:3000"
+    ].filter(Boolean),
     methods: ["GET", "POST"]
   }
 });
@@ -118,14 +122,18 @@ app.use(helmet());
 
 // CORS Configuration
 app.use(cors({ 
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    // origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: [
+  process.env.FRONTEND_URL,
+  "http://localhost:3000"
+].filter(Boolean),
     credentials: true,
 }));
 
 // Rate limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10000, // limit each IP to 100 requests per windowMs
+    max: 1000, // limit each IP to 100 requests per windowMs
     message: "Too many requests from this IP, please try again later.",
 });
 app.use(limiter);
@@ -208,7 +216,7 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(err.status || 500).json({
         success: false,
-        message: process.env.NODE_ENV === "development" ? err.message : "Internal server error",
+        message: process.env.NODE_ENV !== "production",
         error: "Something went wrong!",
     });
 });
