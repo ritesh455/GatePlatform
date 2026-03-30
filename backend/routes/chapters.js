@@ -8,21 +8,24 @@ const fs = require("fs").promises;
 const crypto = require("crypto");
 
 // --- FILE STORAGE CONFIGURATION ---
-const uploadDir = path.join(__dirname, "../public");
-fs.mkdir(uploadDir, { recursive: true }).catch(console.error);
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = crypto.randomBytes(16).toString("hex");
-    const originalExtension = path.extname(file.originalname);
-    cb(null, `${uniqueSuffix}${originalExtension}`);
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "educational_platform", // your folder
+    resource_type: "auto", // VERY IMPORTANT (supports all files)
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
 const router = express.Router();
 
@@ -88,7 +91,7 @@ router.get("/", authenticateToken, async (req, res) => {
           json_agg(DISTINCT jsonb_build_object(
             'id', p.id,
             'file_name', p.file_name,
-            'url', '/public/' || p.file_path,
+            'url', p.file_path,
             'uploadedAt', p.created_at
           )) FILTER (WHERE p.id IS NOT NULL), '[]'
         ) AS pdf_note,
@@ -154,7 +157,7 @@ router.get("/:id", authenticateToken, param("id").isUUID(), async (req, res) => 
           json_agg(DISTINCT jsonb_build_object(
             'id', p.id,
             'file_name', p.file_name,
-            'url', '/public/' || p.file_path,
+            'url', p.file_path,
             'uploadedAt', p.created_at
           )) FILTER (WHERE p.id IS NOT NULL), '[]'
         ) AS pdf_note,
@@ -250,7 +253,7 @@ router.post(
       const result = await query(
         // CORRECTED: Return 'file_path' along with other fields
         "INSERT INTO pdf_note (chapter_id, file_name, file_path) VALUES ($1, $2, $3) RETURNING id, file_name, file_path, created_at",
-        [chapterId, req.file.originalname, req.file.filename]
+        [chapterId, req.file.originalname, req.file.path]
       );
 
       const pdf = result.rows[0];
@@ -258,7 +261,7 @@ router.post(
       // CORRECTED: Construct the full URL here before sending the response
       const pdfWithUrl = {
         ...pdf,
-        url: `/public/${pdf.file_path}`,
+        url: pdf.file_path,
       };
 
       res.status(201).json({ success: true, data: pdfWithUrl });
@@ -304,15 +307,14 @@ router.get("/:chapterId/pdfs/:pdfId/open", authenticateToken, param("chapterId")
     }
 
     const { file_path } = result.rows[0];
-    const absolutePath = path.join(uploadDir, file_path);
+    // const absolutePath = path.join(uploadDir, file_path);
 
     // Set headers for in-browser viewing
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'inline'); // Key change for viewing
 
     // Read the file and send it
-    const fileContent = await fs.readFile(absolutePath);
-    res.send(fileContent);
+    return res.redirect(file_path);
 
   } catch (error) {
     console.error("PDF open error:", error);
@@ -395,7 +397,7 @@ router.put("/:id", authenticateToken, requireAdmin, async (req, res) => {
           json_agg(DISTINCT jsonb_build_object(
             'id', p.id,
             'file_name', p.file_name,
-            'url', '/public/' || p.file_path,
+            'url', p.file_path,
             'uploadedAt', p.created_at
           )) FILTER (WHERE p.id IS NOT NULL), '[]'
         ) AS pdf_note,
@@ -442,12 +444,15 @@ router.delete("/:chapterId/pdfs/:pdfId", authenticateToken, requireAdmin, async 
     if (fileResult.rows.length === 0) return res.status(404).json({ success: false, message: "PDF not found" });
 
     const fileName = fileResult.rows[0].file_path;
-    const filePath = path.join(uploadDir, fileName);
+    // const filePath = path.join(uploadDir, fileName);
 
     const deleteResult = await query("DELETE FROM pdf_note WHERE id = $1 AND chapter_id = $2 RETURNING *", [pdfId, chapterId]);
     if (deleteResult.rows.length === 0) return res.status(404).json({ success: false, message: "PDF not found" });
 
-    await fs.unlink(filePath);
+    // await fs.unlink(filePath);
+    // await cloudinary.uploader.destroy(public_id, {
+    //   resource_type: "auto"
+    // });
 
     res.json({ success: true, message: "PDF deleted successfully" });
   } catch (error) {
