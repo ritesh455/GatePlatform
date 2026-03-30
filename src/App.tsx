@@ -20,29 +20,29 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { DataProvider as AppDataProvider } from './contexts/DataContext'; 
 import { SocketProvider } from './contexts/SocketContext';
 
-import UserProfile from './components/UserProfile';
+import UserProfile from './component/UserProfile';
 
-// --- IMPORT ALL PAGES/COMPONENTS ---
+// --- IMPORT ALL PAGES/component ---
 import HomePage from './screens/HomePage'; 
 import LoginPage from './screens/LoginPage'; 
 import RegisterPage from './screens/RegisterPage'; 
 import NotFound from './screens/NotFound';
 import SystemAdmin from './screens/SystemAdmin'; // From New App.tsx
 
-// --- IMPORT EXISTING APP COMPONENTS (kept for reference) ---
-import UserDashboard from './components/UserDashboard';
-import AdminDashboard from './components/AdminDashboard';
-import StudyMaterials from './components/StudyMaterials';
-import MockTests from './components/MockTests';
-import Progress from './components/Progress';
-import AdminPanel from './components/AdminPanel';
-import ChapterManagement from './components/ChapterManagement';
-import MaterialView from "./components/MaterialView"
-import TestHistory from "./components/TestHistory";
-import GateChatbot from "./components/GateChatbot";
+// --- IMPORT EXISTING APP component (kept for reference) ---
+import UserDashboard from './component/UserDashboard';
+import AdminDashboard from './component/AdminDashboard';
+import StudyMaterials from './component/StudyMaterials';
+import MockTests from './component/MockTests';
+import Progress from './component/Progress';
+import AdminPanel from './component/AdminPanel';
+import ChapterManagement from './component/ChapterManagement';
+import MaterialView from "./component/MaterialView"
+import TestHistory from "./component/TestHistory";
+import GateChatbot from "./component/GateChatbot";
 import CommunityPage from './screens/CommunityPage';
 // ------------------------------------
-import PaperManagement from './components/PaperManagement';
+import PaperManagement from './component/PaperManagement';
 
 // --- ROUTING CONSTANTS ---
 const ADMIN_LOGIN_PATH = '/system-admin/login';
@@ -55,7 +55,7 @@ type ViewName = 'dashboard' | 'admin' | 'chapters' | 'study' | 'tests' | 'progre
 // 1. AppContent (Your Original Authenticated Dashboard UI)
 // 🛑 The internal view state logic ('currentView') of the old AppContent is REMOVED
 // and replaced by the current URL path using useLocation().
-// The components that used to be rendered by the switch statement are now
+// The component that used to be rendered by the switch statement are now
 // direct routes in the AppRouter, simplifying AppContent to just the shell.
 
 function AppContent() {

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import FindPartner from "../components/community/FindPartner";
-import IncomingRequests from "../components/community/IncomingRequests";
-import ChatRoom from "../components/community/ChatRoom";
-import ChatList from "../components/community/ChatList";
-import SearchUser from "../components/community/SearchUser";
+import FindPartner from "../component/community/FindPartner";
+import IncomingRequests from "../component/community/IncomingRequests";
+import ChatRoom from "../component/community/ChatRoom";
+import ChatList from "../component/community/ChatList";
+import SearchUser from "../component/community/SearchUser";
 import { FaUsers, FaCompass, FaComments, FaRobot, FaUserPlus, FaEnvelopeOpenText } from "react-icons/fa";
 
 type TabType = "discover" | "requests" | "messages";
