@@ -28,19 +28,31 @@ const GateChatbot: React.FC = () => {
 };
 
   /* ---------------- Load Local Chat ---------------- */
+useEffect(() => {
+  if (typeof window === "undefined") return;
 
-  useEffect(() => {
+  try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       setMessages(JSON.parse(saved));
     }
-  }, []);
+  } catch (error) {
+    console.error("Error loading chat:", error);
+    localStorage.removeItem(STORAGE_KEY);
+  }
+}, []);
 
   /* ---------------- Save Local Chat ---------------- */
 
-  useEffect(() => {
+useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-  }, [messages]);
+  } catch (error) {
+    console.error("Error saving chat:", error);
+  }
+}, [messages]);
 
   /* ---------------- Send Message ---------------- */
 
@@ -61,18 +73,19 @@ const GateChatbot: React.FC = () => {
 
     try {
 
-      const res = await apiService.askGateAI(question);
+      const res: any = await apiService.askGateAI(question);
 
       console.log("AI RESPONSE:", res); // DEBUG
 
       let answer = "";
 
-      // Handle both API formats safely
-      if (res?.answer) {
-        answer = res.answer;
-      } else if (res?.data?.answer) {
-        answer = res.data.answer;
-      }
+if (res?.answer) {
+  answer = res.answer;
+} else if (res?.data?.answer) {
+  answer = res.data.answer;
+} else if (typeof res === "string") {
+  answer = res;
+}
 
       if (!answer) {
         answer = "AI could not generate an answer.";

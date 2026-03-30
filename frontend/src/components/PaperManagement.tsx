@@ -19,15 +19,17 @@ const DEFAULT_PAPERS = [
 // Hook to manage state synchronized with localStorage
 const useLocalStoragePapers = () => {
     // 1. Initialize state from localStorage or use default
-    const [papers, setPapers] = useState(() => {
-        try {
-            const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-            return stored ? JSON.parse(stored) : DEFAULT_PAPERS;
-        } catch (error) {
-            console.error("Error reading localStorage:", error);
-            return DEFAULT_PAPERS;
-        }
-    });
+    const [papers, setPapers] = useState<any[]>(() => {
+    if (typeof window === "undefined") return DEFAULT_PAPERS;
+
+    try {
+        const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+        return stored ? JSON.parse(stored) : DEFAULT_PAPERS;
+    } catch (error) {
+        console.error("Error reading localStorage:", error);
+        return DEFAULT_PAPERS;
+    }
+});
 
     // 2. useEffect to write state changes to localStorage
     useEffect(() => {
@@ -47,7 +49,7 @@ const useLocalStoragePapers = () => {
     
     // --- CRUD Mock Functions ---
 
-    const addPaper = (newPaperData) => {
+    const addPaper = (newPaperData:any) => {
         const newPaper = {
             id: generateId(),
             paper_number: parseInt(newPaperData.paper_number),
@@ -58,7 +60,7 @@ const useLocalStoragePapers = () => {
         setPapers(prev => [...prev, newPaper]);
     };
 
-    const updatePaper = (id, updatedData) => {
+    const updatePaper = (id:string, updatedData:any) => {
         setPapers(prev => 
             prev.map(paper => 
                 paper.id === id ? { 
@@ -70,11 +72,11 @@ const useLocalStoragePapers = () => {
         );
     };
 
-    const deletePaper = (id) => {
+    const deletePaper = (id:string) => {
         setPapers(prev => prev.filter(paper => paper.id !== id));
     };
 
-    const addPdfToPaper = async (paperId, pdfData) => {
+    const addPdfToPaper = async (paperId:string, pdfData:any) => {
         const newPdf = { 
             id: generateId(), 
             file_name: pdfData.file_name || pdfData.file.name, 
@@ -89,12 +91,12 @@ const useLocalStoragePapers = () => {
         );
     };
 
-    const removePdfFromPaper = (paperId, pdfId) => {
+    const removePdfFromPaper = (paperId:string, pdfId:string) => {
         setPapers(prev => 
             prev.map(paper => 
                 paper.id === paperId ? { 
                     ...paper, 
-                    pdfNotes: paper.pdfNotes.filter(pdf => pdf.id !== pdfId)
+                    pdfNotes: paper.pdfNotes.filter((pdf:any) => pdf.id !== pdfId)
                 } : paper
             )
         );
@@ -115,8 +117,15 @@ const useLocalStoragePapers = () => {
 // --- UI Components ---
 
 // Confirmation Modal Component for deletion
-const DeleteConfirmationModal = ({ paper, onClose, onConfirm }) => {
-    if (!paper) return null;
+const DeleteConfirmationModal = ({
+  paper,
+  onClose,
+  onConfirm,
+}: {
+  paper: any;
+  onClose: () => void;
+  onConfirm: () => void;
+}) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -178,7 +187,7 @@ const PaperManagement: React.FC = () => {
   // Extract unique subjects/titles for the filter dropdown
   const uniqueSubjects = useMemo(() => {
     const subjects = new Set<string>();
-    papers.forEach(paper => {
+    papers.forEach((paper:any) => {
         if (paper.paper_title) {
             subjects.add(paper.paper_title);
         }
@@ -190,7 +199,7 @@ const PaperManagement: React.FC = () => {
   // Filter and sort papers based on search query AND subject filter
   const filteredPapers = useMemo(() => {
     return papers
-      .filter(paper => {
+      .filter((paper:any) => {
           // 1. Search filter
           const matchesSearch = paper.paper_title.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -446,7 +455,7 @@ const PaperManagement: React.FC = () => {
       {/* Papers Grid */}
       <div className="space-y-6">
         {filteredPapers 
-          .map((paper) => {
+          .map((paper:any) => {
             const pdfNotes = paper.pdfNotes ?? [];
 
             return (
@@ -503,7 +512,7 @@ const PaperManagement: React.FC = () => {
                     </h3>
                     {pdfNotes.length > 0 ? (
                       <div className="space-y-3">
-                        {pdfNotes.map((pdf) => (
+                        {pdfNotes.map((pdf:any) => (
                           <div key={pdf.id} className="bg-slate-50 rounded-lg p-4 flex items-center justify-between">
                             <div className="flex items-center space-x-3">
                               <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">

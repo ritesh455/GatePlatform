@@ -37,11 +37,13 @@ const TestHistory: React.FC = () => {
       const res = await apiService.getTestHistory(search);
 
       if (res.success) {
-        const testsData = Array.isArray(res.data?.tests)
-          ? res.data.tests
-          : Array.isArray(res.data)
-          ? res.data
-          : [];
+        const data: any = res.data;
+
+const testsData = Array.isArray(data?.tests)
+  ? data.tests
+  : Array.isArray(data)
+  ? data
+  : [];
 
         setTests(testsData);
       }
@@ -71,11 +73,13 @@ const TestHistory: React.FC = () => {
         console.log("Attempts response:", res);
 
         if (res.success) {
-          const attemptsData = Array.isArray(res.data?.attempts)
-            ? res.data.attempts
-            : Array.isArray(res.data)
-            ? res.data
-            : [];
+         const data: any = res.data;
+
+const attemptsData = Array.isArray(data?.attempts)
+  ? data.attempts
+  : Array.isArray(data)
+  ? data
+  : [];
 
           setAttempts((prev) => ({
             ...prev,
