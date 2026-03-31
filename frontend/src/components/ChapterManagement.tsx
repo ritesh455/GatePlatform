@@ -4,11 +4,36 @@ import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { apiService } from '../services/api';
 
+interface Chapter {
+  id: string;
+  chapter_number: number;
+  chapter_title: string;
+  branch?: string | null; // Fixed: Added null to match ChapterContent
+  pdfNotes?: PdfNote[];
+  videoTutorials?: VideoTutorial[];
+}
+
+interface PdfNote {
+  id: string;
+  file_name: string;
+  created_at?: string;
+  url?: string;
+}
+
+interface VideoTutorial {
+  id: string;
+  title: string;
+  youtubeUrl: string;
+  duration?: string;
+  addedAt?: string;
+}
+
 interface DeleteConfirmationModalProps {
-  chapter: any;
+  chapter: Chapter | null;
   onClose: () => void;
   onConfirm: () => void;
 }
+
 // Confirmation Modal Component to replace window.confirm
 const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({ chapter, onClose, onConfirm }) => {
     if (!chapter) return null;
@@ -22,12 +47,14 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({ chapt
                 </p>
                 <div className="flex justify-end space-x-4">
                     <button
+                        type="button"
                         onClick={onClose}
                         className="px-4 py-2 text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
                     >
                         Cancel
                     </button>
                     <button
+                        type="button"
                         onClick={onConfirm}
                         className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                     >
@@ -56,30 +83,31 @@ const ChapterManagement: React.FC = () => {
   } = useData();
   const { user } = useAuth();
 
-  const [showAddChapter, setShowAddChapter] = useState(false);
-  const [showAddPdf, setShowAddPdf] = useState(false);
-  const [showAddVideo, setShowAddVideo] = useState(false);
-  const [editingChapter, setEditingChapter] = useState<any>(null);
+  const [showAddChapter, setShowAddChapter] = useState<boolean>(false);
+  const [showAddPdf, setShowAddPdf] = useState<boolean>(false);
+  const [showAddVideo, setShowAddVideo] = useState<boolean>(false);
+  const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
+  const [chapterToDelete, setChapterToDelete] = useState<Chapter | null>(null);
   const [selectedChapterId, setSelectedChapterId] = useState<string>('');
   
   // State for search functionality
-  const [searchQuery, setSearchQuery] = useState('');
-  // State for deletion confirmation
-  const [chapterToDelete, setChapterToDelete] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   // State for the new subject filtering feature
-  const [subjectFilter, setSubjectFilter] = useState('All Subjects');
+  const [subjectFilter, setSubjectFilter] = useState<string>('All Subjects');
 
 
-  const [chapterForm, setChapterForm] = useState({ chapter_number: 1, chapter_title: '' });
+  const [chapterForm, setChapterForm] = useState<{ chapter_number: number; chapter_title: string }>({ chapter_number: 1, chapter_title: '' });
   const [pdfForm, setPdfForm] = useState<{ title: string; file: File | null }>({ title: '', file: null });
-  const [videoForm, setVideoForm] = useState({ title: '', youtubeUrl: '', duration: '' });
+  const [videoForm, setVideoForm] = useState<{ title: string; youtubeUrl: string; duration: string }>({ title: '', youtubeUrl: '', duration: '' });
 
-  const [videoLoading, setVideoLoading] = useState(false);
+  const [videoLoading, setVideoLoading] = useState<boolean>(false);
+  const [pdfLoading, setPdfLoading] = useState<boolean>(false);
 
   // Extract unique subjects for the filter dropdown
   const uniqueSubjects = useMemo(() => {
     const subjects = new Set<string>();
-    chapters.forEach(chapter => {
+    // Cast chapters to any or use the specific type to resolve the forEach error
+    (chapters as any[]).forEach((chapter) => {
         if (chapter.chapter_title) {
             subjects.add(chapter.chapter_title);
         }
@@ -90,8 +118,8 @@ const ChapterManagement: React.FC = () => {
 
   // Filter and sort chapters based on search query AND subject filter
   const filteredChapters = useMemo(() => {
-    return chapters
-      .filter(chapter => {
+    return (chapters as any[])
+      .filter((chapter) => {
           // 1. Search filter
           const matchesSearch =
   (chapter.chapter_title ?? "")
@@ -108,9 +136,10 @@ const ChapterManagement: React.FC = () => {
 
 
   // Handler for delete confirmation modal
-  const handleDeleteChapterClick = (chapterId: string) => {
-    setChapterToDelete(chapters.find(c => c.id === chapterId));
-  };
+const handleDeleteChapterClick = (chapterId: string) => {
+  const found = (chapters as any[]).find((c) => c.id === chapterId);
+  setChapterToDelete(found || null);
+};
 
   const confirmDelete = () => {
     if (chapterToDelete) {
@@ -133,19 +162,6 @@ const ChapterManagement: React.FC = () => {
     setShowAddChapter(false);
   };
 
-  const [pdfLoading, setPdfLoading] = useState(false);
-
-  // const handleAddPdf = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (selectedChapterId && pdfForm.file) {
-  //     // Correct the property name from 'title' to 'file_name'
-  //     const pdfData = { file_name: pdfForm.title, file: pdfForm.file };
-  //     await addPdfToChapter(selectedChapterId, pdfData);
-  //   }
-  //   setPdfForm({ title: '', file: null });
-  //   setShowAddPdf(false);
-  //   setSelectedChapterId('');
-  // };
   const handleAddPdf = async (e: React.FormEvent) => {
   e.preventDefault();
 
@@ -193,7 +209,7 @@ const handleAddVideo = async (e: React.FormEvent) => {
   setSelectedChapterId('');
 };
 
-  const handleEditChapter = (chapter: any) => {
+  const handleEditChapter = (chapter: Chapter) => {
     setChapterForm({ chapter_number: chapter.chapter_number, chapter_title: chapter.chapter_title });
     setEditingChapter(chapter);
     setShowAddChapter(true);
@@ -381,16 +397,16 @@ const handleAddVideo = async (e: React.FormEvent) => {
                   Cancel
                 </button>
                 <button
-  type="submit"
-  disabled={pdfLoading}
-  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg flex items-center justify-center"
->
-  {pdfLoading ? (
-    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-  ) : (
-    "Add PDF"
-  )}
-</button>
+                  type="submit"
+                  disabled={pdfLoading}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg flex items-center justify-center"
+                >
+                  {pdfLoading ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  ) : (
+                    "Add PDF"
+                  )}
+                </button>
               </div>
                <X 
                   className="absolute top-3 right-3 w-5 h-5 text-slate-400 cursor-pointer hover:text-slate-700"
@@ -456,16 +472,16 @@ const handleAddVideo = async (e: React.FormEvent) => {
                   Cancel
                 </button>
               <button
-  type="submit"
-  disabled={videoLoading}
-  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg flex items-center justify-center"
->
-  {videoLoading ? (
-    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-  ) : (
-    "Add Video"
-  )}
-</button>
+                type="submit"
+                disabled={videoLoading}
+                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg flex items-center justify-center"
+              >
+                {videoLoading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                ) : (
+                  "Add Video"
+                )}
+              </button>
               </div>
               <X 
                   className="absolute top-3 right-3 w-5 h-5 text-slate-400 cursor-pointer hover:text-slate-700"
@@ -491,7 +507,7 @@ const handleAddVideo = async (e: React.FormEvent) => {
       {/* Chapters Grid */}
       <div className="space-y-6">
         {filteredChapters // Use filtered chapters here
-          .map((chapter) => {
+          .map((chapter: any) => {
             const pdfNotes = chapter.pdfNotes ?? [];
             const videoTutorials = chapter.videoTutorials ?? [];
 
@@ -499,10 +515,10 @@ const handleAddVideo = async (e: React.FormEvent) => {
               <div key={chapter.id ?? `chapter-${chapter.chapter_number}`} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 {/* Chapter Header */}
                 <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between cursor-pointer"
-     onClick={() => toggleChapter(chapter.id)}>
+     onClick={() => chapter.id && toggleChapter(chapter.id)}>
                   <div>
                     <div className="flex items-center space-x-2">
-  {openChapters[chapter.id] ? (
+  {openChapters[chapter.id ?? ""] ? (
     <ChevronDown className="w-5 h-5 text-slate-600" />
   ) : (
     <ChevronRight className="w-5 h-5 text-slate-600" />
@@ -521,7 +537,7 @@ const handleAddVideo = async (e: React.FormEvent) => {
                   </div>
 
                   {user?.role === 'admin' && (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => {
                           setSelectedChapterId(chapter.id);
@@ -544,7 +560,7 @@ const handleAddVideo = async (e: React.FormEvent) => {
                         <span>Add Video</span>
                       </button>
 
-                      <button onClick={() => handleEditChapter(chapter)} className="p-2 text-slate-600 hover:text-blue-600 transition-colors">
+                      <button onClick={() => handleEditChapter(chapter as Chapter)} className="p-2 text-slate-600 hover:text-blue-600 transition-colors">
                         <Edit size={16} />
                       </button>
 
@@ -560,7 +576,7 @@ const handleAddVideo = async (e: React.FormEvent) => {
                 </div>
 
                 {/* Chapter Content */}
-                {openChapters[chapter.id] && (
+                {openChapters[chapter.id ?? ""] && (
   <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* PDF Notes Section */}
                   <div>
@@ -570,7 +586,7 @@ const handleAddVideo = async (e: React.FormEvent) => {
                     </h3>
                     {pdfNotes.length > 0 ? (
                       <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2">
-                        {pdfNotes.map((pdf) => (
+                        {pdfNotes.map((pdf: any) => (
                           <div key={pdf.id} className="bg-slate-50 rounded-lg p-4 flex items-center justify-between">
                             <div className="flex items-center space-x-3">
                               <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
@@ -583,47 +599,20 @@ const handleAddVideo = async (e: React.FormEvent) => {
                             </div>
 
                             <div className="flex items-center space-x-2">
-                              {/* **FIX:** Change the `<a>` tag to open the PDF in a new tab */}
-                              {/* http://localhost:5000/public/7dbb3fc3dd1023dd5e626ae894095fe2.pdf */}
-                              {/* <button
-                                onClick={async () => {
-                                  try {
-                                    // Use the API helper that fetches the PDF with auth and opens in a new tab
-                                    // await apiService.openPdfInNewTab(chapter.id, pdf.id);
-                                    if (pdf.url) {
-                                            const fixedUrl = pdf.url.replace("/image/upload/", "/raw/upload/");
-                                            window.open(fixedUrl, "_blank");
-                                        }
-                                  } catch (err) {
-                                    console.error('Failed to open PDF:', err);
-                                    // Fallback: open the raw URL if available
-                                    if (pdf.url) window.open(pdf.url, '_blank');
+                              <button
+                                onClick={() => {
+                                  if (pdf.url) {
+                                    let fixedUrl = pdf.url;
+                                    if (fixedUrl.startsWith("https//")) {
+                                      fixedUrl = fixedUrl.replace("https//", "https://");
+                                    } 
+                                    window.open(fixedUrl, "_blank");
                                   }
                                 }}
-                                className="p-2 text-blue-600 hover:text-blue-700 transition-colors cursor-pointer"
-                                aria-label={`Open ${pdf.file_name}`}
+                                className="p-2 text-blue-600 hover:text-blue-700"
                               >
                                 <FileText size={16} />
-                              </button> */}
-
-                              <button
-  onClick={() => {
-    console.log(pdf.url);
-    if (pdf.url) {
-  let fixedUrl = pdf.url;
-
-  // Fix https issue
-  if (fixedUrl.startsWith("https//")) {
-    fixedUrl = fixedUrl.replace("https//", "https://");
-  } 
-
-  window.open(fixedUrl, "_blank");
-}
-  }}
-  className="p-2 text-blue-600 hover:text-blue-700"
->
-  <FileText size={16} />
-</button>
+                              </button>
 
                               {user?.role === 'admin' && (
                                 <button onClick={() => { removePdfFromChapter(chapter.id, pdf.id); alert("PDF removed successfully ❌"); }} className="p-2 text-red-600 hover:text-red-700 transition-colors">
@@ -650,7 +639,7 @@ const handleAddVideo = async (e: React.FormEvent) => {
                     </h3>
                     {videoTutorials.length > 0 ? (
                       <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2">
-                        {videoTutorials.map((video) => (
+                        {videoTutorials.map((video: any) => (
                           <div key={video.id} className="bg-slate-50 rounded-lg p-4">
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex-1">

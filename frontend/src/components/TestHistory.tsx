@@ -22,25 +22,43 @@ type TestAttempt = {
   created_at?: string;
 };
 
+// Added strict interfaces for API responses
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
+
+interface TestHistoryData {
+  tests?: TestHistory[];
+}
+
+interface TestAttemptsData {
+  attempts?: TestAttempt[];
+}
+
 /* ---------- Component ---------- */
 
 const TestHistory: React.FC = () => {
   const [tests, setTests] = useState<TestHistory[]>([]);
   const [attempts, setAttempts] = useState<Record<string, TestAttempt[]>>({});
   const [openTest, setOpenTest] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState<string>("");
 
   /* ---------- Fetch Tests ---------- */
 
-  const fetchTests = async () => {
+  const fetchTests = async (): Promise<void> => {
     try {
-      const res = await apiService.getTestHistory(search);
+      // Cast the response to handle strict property checking
+      const res = (await apiService.getTestHistory(search)) as ApiResponse<TestHistoryData | TestHistory[]>;
 
       if (res.success) {
-        const testsData = Array.isArray(res.data?.tests)
-          ? res.data.tests
-          : Array.isArray(res.data)
-          ? res.data
+        const data = res.data;
+
+        // Use type guards instead of 'any'
+        const testsData = Array.isArray(data)
+          ? data
+          : Array.isArray((data as TestHistoryData)?.tests)
+          ? (data as TestHistoryData).tests || []
           : [];
 
         setTests(testsData);
@@ -56,7 +74,7 @@ const TestHistory: React.FC = () => {
 
   /* ---------- Toggle Test ---------- */
 
-  const toggleTest = async (testId: string) => {
+  const toggleTest = async (testId: string): Promise<void> => {
     if (openTest === testId) {
       setOpenTest(null);
       return;
@@ -66,15 +84,18 @@ const TestHistory: React.FC = () => {
 
     if (!attempts[testId]) {
       try {
-        const res = await apiService.getTestAttempts(testId);
+        const res = (await apiService.getTestAttempts(testId)) as ApiResponse<TestAttemptsData | TestAttempt[]>;
 
         console.log("Attempts response:", res);
 
         if (res.success) {
-          const attemptsData = Array.isArray(res.data?.attempts)
-            ? res.data.attempts
-            : Array.isArray(res.data)
-            ? res.data
+          const data = res.data;
+
+          // Use type guards instead of 'any'
+          const attemptsData = Array.isArray(data)
+            ? data
+            : Array.isArray((data as TestAttemptsData)?.attempts)
+            ? (data as TestAttemptsData).attempts || []
             : [];
 
           setAttempts((prev) => ({
@@ -103,7 +124,7 @@ const TestHistory: React.FC = () => {
           type="text"
           placeholder="Search tests..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
           className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -137,46 +158,48 @@ const TestHistory: React.FC = () => {
 
             {openTest === test.test_id && (
               <div className="p-4 border-t">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left border-b">
-                      <th className="py-2">Email</th>
-                      <th>City</th>
-                      <th>State</th>
-                      <th>Score</th>
-                      <th>Attempt Time</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {(attempts[test.test_id] ?? []).length === 0 && (
-                      <tr>
-                        <td
-                          colSpan={5}
-                          className="text-center py-4 text-slate-500"
-                        >
-                          No attempts found
-                        </td>
+                <div className="overflow-x-auto"> {/* Added wrapper for table safety */}
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-left border-b">
+                        <th className="py-2">Email</th>
+                        <th>City</th>
+                        <th>State</th>
+                        <th>Score</th>
+                        <th>Attempt Time</th>
                       </tr>
-                    )}
+                    </thead>
 
-                    {(attempts[test.test_id] ?? []).map((a, i) => (
-                      <tr key={i} className="border-b">
-                        <td className="py-2">{a.email}</td>
-                        <td>{a.city}</td>
-                        <td>{a.state}</td>
-                        <td>
-                          {a.score}/{a.total_questions}
-                        </td>
-                        <td>
-                          {new Date(
-                            a.completed_at || a.created_at || ""
-                          ).toLocaleString()}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    <tbody>
+                      {(attempts[test.test_id] ?? []).length === 0 && (
+                        <tr>
+                          <td
+                            colSpan={5}
+                            className="text-center py-4 text-slate-500"
+                          >
+                            No attempts found
+                          </td>
+                        </tr>
+                      )}
+
+                      {(attempts[test.test_id] ?? []).map((a, i) => (
+                        <tr key={i} className="border-b">
+                          <td className="py-2">{a.email}</td>
+                          <td>{a.city}</td>
+                          <td>{a.state}</td>
+                          <td>
+                            {a.score}/{a.total_questions}
+                          </td>
+                          <td>
+                            {new Date(
+                              a.completed_at || a.created_at || ""
+                            ).toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
