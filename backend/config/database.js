@@ -110,8 +110,8 @@ const seedAdmin = async () => {
     );
 
     console.log("✅ Default admin created:");
-    console.log("📧 Email: admin@example.com");
-    console.log("🔑 Password: admin123");
+    // console.log("📧 Email: admin@example.com");
+    // console.log("🔑 Password: admin123");
 
   } catch (error) {
     console.error("❌ Error seeding admin:", error.message);

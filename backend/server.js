@@ -53,7 +53,7 @@ io.on("connection", (socket) => {
 
     socket.join(`user_${userNo}`);
 
-    console.log(`User ${userNo} joined personal room`);
+    // console.log(`User ${userNo} joined personal room`);
 
   });
 
@@ -73,7 +73,7 @@ io.on("connection", (socket) => {
 
     socket.join(`group_${groupId}`);
 
-    console.log(`User joined group ${groupId}`);
+    // console.log(`User joined group ${groupId}`);
 
   });
 
@@ -107,7 +107,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
 
-    console.log("User disconnected:", socket.id);
+    // console.log("User disconnected:", socket.id);
 
   });
 

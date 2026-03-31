@@ -17,7 +17,7 @@ socket.on("connect", () => {
 });
 
 socket.on("receiveMessage", (msg) => {
-  console.log("New Message:", msg);
+  // console.log("New Message:", msg);
 });
 
 socket.on("sendMessage", async (data) => {

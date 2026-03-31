@@ -51,12 +51,12 @@ router.get("/", authenticateToken, async (req, res) => {
     const userRole = req.user?.role;
     const userEmail = req.user?.email;
 
-    console.log("=== CHAPTERS FETCH DEBUG ===");
-    console.log("User Email:", userEmail);
-    console.log("User Role:", userRole);
-    console.log("User Branch:", studentBranch);
-    console.log("Full req.user:", req.user);
-    console.log("=============================");
+    // console.log("=== CHAPTERS FETCH DEBUG ===");
+    // console.log("User Email:", userEmail);
+    // console.log("User Role:", userRole);
+    // console.log("User Branch:", studentBranch);
+    // console.log("Full req.user:", req.user);
+    // console.log("=============================");
 
     // Build WHERE clause based on user role
     let whereClause = "";
@@ -66,22 +66,22 @@ router.get("/", authenticateToken, async (req, res) => {
     if (userRole === "student" && studentBranch) {
       whereClause = "WHERE c.branch = $1 OR c.branch = $2";
       params = [studentBranch, 'ALL']; // Filter by student's branch OR 'ALL'
-      console.log(`[Chapters] APPLYING FILTER: Student from branch '${studentBranch}'`);
+      // console.log(`[Chapters] APPLYING FILTER: Student from branch '${studentBranch}'`);
     } else if (userRole === "student" && !studentBranch) {
       // Students without a branch see only 'ALL' chapters (assuming 'ALL' is the default common content tag)
       whereClause = "WHERE c.branch = $1";
       params = ['ALL'];
-      console.log(`[Chapters] WARNING: Student has no branch assigned - showing 'ALL' chapters only.`);
+      // console.log(`[Chapters] WARNING: Student has no branch assigned - showing 'ALL' chapters only.`);
     } 
     // 2. MODIFIED Admin Logic: If not a student, restrict by their own branch
     else if (studentBranch) { 
         whereClause = "WHERE c.branch = $1";
         params = [studentBranch];
-        console.log(`[Chapters] APPLYING ADMIN FILTER: Admin restricted to branch '${studentBranch}' chapters.`);
+        // console.log(`[Chapters] APPLYING ADMIN FILTER: Admin restricted to branch '${studentBranch}' chapters.`);
     }
     // 3. Super Admin/Unassigned User Logic: No filter applied
     else {
-      console.log(`[Chapters] NO FILTER: Admin user without assigned branch/Super Admin - showing all chapters`);
+      // console.log(`[Chapters] NO FILTER: Admin user without assigned branch/Super Admin - showing all chapters`);
     }
 
     const query_text = `
@@ -112,12 +112,12 @@ router.get("/", authenticateToken, async (req, res) => {
       ORDER BY c.chapter_number
     `;
 
-    console.log("Query text:", query_text);
-    console.log("Query params:", params);
+    // console.log("Query text:", query_text);
+    // console.log("Query params:", params);
 
     const result = await query(query_text, params);
 
-    console.log(`[Chapters] Returned ${result.rows.length} chapters`);
+    // console.log(`[Chapters] Returned ${result.rows.length} chapters`);
     
     const chapters = result.rows.map(normalizeChapter);
     res.json({ success: true, data: chapters });
@@ -209,7 +209,7 @@ router.post(
       // MODIFIED: Removed branch from destructuring
       const { chapter_number, chapter_title } = req.body;
       
-      console.log(`[Chapters] Creating chapter: ${chapter_title} (${chapter_number}) for branch: ${adminBranch}`);
+      // console.log(`[Chapters] Creating chapter: ${chapter_title} (${chapter_number}) for branch: ${adminBranch}`);
       
       // MODIFIED: Insert adminBranch into the query
       const result = await query(
