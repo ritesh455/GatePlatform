@@ -6,10 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-<<<<<<< HEAD
-=======
     "lint": "eslint .",
->>>>>>> 639dc6abba09e25ce837dcf8c7c159348fe2670a
     "preview": "vite preview"
   },
   "dependencies": {
