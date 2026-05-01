@@ -336,6 +336,12 @@ const RegisterPage = () => {
             {formData.role === "admin" && (
               <div className="space-y-5">
                 <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Branch</label>
+                    <select name="branch" value={formData.branch} onChange={handleChange} className="w-full p-3 border border-slate-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-green-500">
+                      {branches.map(b => <option key={b} value={b}>{b}</option>)}
+                    </select>
+                  </div>
+                <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
