@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Users, BookOpen, Target, TrendingUp, Award } from 'lucide-react'; // FIX: removed Calendar
 import { useData } from '../contexts/DataContext';
+import { useNavigate } from "react-router-dom";
 
 // Define a simple User interface to avoid the 'any' type error
 interface _User { // FIX: renamed to avoid unused error
@@ -10,6 +11,7 @@ interface _User { // FIX: renamed to avoid unused error
 
 const AdminDashboard: React.FC = () => {
   const { studyMaterials, mockTests, testResults, totalStudents } = useData();
+  const navigate = useNavigate();
 
   // --- Helper Function ---
   const findUserName = (userId: string | number | null | undefined): string => {
@@ -164,14 +166,20 @@ const AdminDashboard: React.FC = () => {
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <h2 className="text-xl font-semibold text-slate-900 mb-6">Quick Actions</h2>
           <div className="space-y-4">
-            <button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-600 transition-all duration-200 transform hover:scale-105">
+            <button 
+            onClick={() => navigate('/chapters')}
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-600 transition-all duration-200 transform hover:scale-105">
               Add Study Material
             </button>
-            <button className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-3 rounded-lg font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 transform hover:scale-105">
+            <button 
+            onClick={() => navigate('/tests')}
+            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-3 rounded-lg font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 transform hover:scale-105">
               Create Mock Test
             </button>
-            <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105">
-              View Analytics
+            <button 
+            onClick={() => navigate('/history')}
+            className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105">
+              View history
             </button>
           </div>
         </div>

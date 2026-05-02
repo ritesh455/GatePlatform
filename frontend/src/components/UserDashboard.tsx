@@ -2,6 +2,7 @@ import React from 'react';
 import { BookOpen, Target, Trophy, Clock, TrendingUp, Award } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from "react-router-dom";
 
 type ViewName = 'dashboard' | 'admin' | 'chapters' | 'study' | 'tests' | 'progress';
 
@@ -12,6 +13,7 @@ interface UserDashboardProps {
 const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigate }) => {
   const { studyMaterials, mockTests, testResults, loading: dataLoading } = useData();
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   // --- Loading & Auth Checks ---
 
@@ -166,17 +168,17 @@ const averageScore = totalQuestionsAnswered > 0
           <h2 className="text-xl font-semibold text-slate-900 mb-6">Quick Actions</h2>
           <div className="space-y-4">
             <button 
-              onClick={() => onNavigate?.('tests')}
+              onClick={() => navigate('/tests')}
               className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-600 transition-all duration-200 transform hover:scale-105">
               Start New Test
             </button>
             <button 
-              onClick={() => onNavigate?.('study')}
+              onClick={() => navigate('/chapters')}
               className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-3 rounded-lg font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 transform hover:scale-105">
               Browse Materials
             </button>
             <button 
-              onClick={() => onNavigate?.('progress')}
+              onClick={() => navigate('/progress')}
               className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105">
               View Progress
             </button>
